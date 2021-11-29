@@ -1,0 +1,139 @@
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Aircraft.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Aircraft.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Aircraft.xml	2021-11-18 19:02:01.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Aircraft.xml	2021-11-27 00:34:25.000000000 +0200
+@@ -27,3 +27,3 @@
+ 			<UseTemplate Name="ASOBO_AIRCRAFT_Door_Open_Close_Template">
+-				<NODE_ID>#NODE_ID_HANDLE#</#NODE_ID>
++				<NODE_ID>#NODE_ID_HANDLE#</NODE_ID>
+ 			</UseTemplate>
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Handling.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Handling.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Handling.xml	2021-11-18 19:02:01.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Handling.xml	2021-11-30 00:03:43.000000000 +0200
+@@ -153,6 +153,6 @@
+ 	<!-- InertSep -->
+-	<Template name="ASOBO_HANDLING_InertSep_Template">
++	<Template Name="ASOBO_HANDLING_InertSep_Template">
+ 		<UseTemplate Name="ASOBO_HANDLING_InertSep_SubTemplate"/>
+ 	</Template>
+-	<Template name="ASOBO_HANDLING_Lever_InertSep_Template">
++	<Template Name="ASOBO_HANDLING_Lever_InertSep_Template">
+ 		<UseTemplate Name="ASOBO_HANDLING_InertSep_Template">
+Only in /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common: Handling.xml~
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Autopilot_Subtemplates.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Autopilot_Subtemplates.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Autopilot_Subtemplates.xml	2021-11-18 19:02:01.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Autopilot_Subtemplates.xml	2021-11-27 00:34:49.000000000 +0200
+@@ -940,3 +940,3 @@
+ 			</Condition>
+-		</Condition>
++		</Parameters>
+ 		<Parameters Type="Default">
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Deice_Subtemplates.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Deice_Subtemplates.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Deice_Subtemplates.xml	2021-11-18 19:02:01.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Deice_Subtemplates.xml	2021-11-27 00:35:32.000000000 +0200
+@@ -442,5 +442,5 @@
+ 				<Case Value="NORM_OFF_HIGH">
+-					<POS_NORM>0</NORM>
+-					<POS_OFF>1</OFF>
+-					<POS_HIGH>2</HIGH>
++					<POS_NORM>0</POS_NORM>
++					<POS_OFF>1</POS_OFF>
++					<POS_HIGH>2</POS_HIGH>
+ 				</Case>
+@@ -654,3 +654,3 @@
+ 							<SEQ1_EMISSIVE_CODE>(B:DEICE_Pitot_#ID#)</SEQ1_EMISSIVE_CODE>
+-							<SEQ2_EMISSIVE_CODE>(B:DEICE_Pitot_#ID#) !</SEQ_EMISSIVE_CODE>
++							<SEQ2_EMISSIVE_CODE>(B:DEICE_Pitot_#ID#) !</SEQ2_EMISSIVE_CODE>
+ 						</Case>
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Engine_Subtemplates.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Engine_Subtemplates.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Engine_Subtemplates.xml	2021-11-18 19:02:01.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Engine_Subtemplates.xml	2021-11-27 00:36:51.000000000 +0200
+@@ -2071,3 +2071,3 @@
+ 		<Update Frequency="1">
+-			(* This update forces the PROP & MIXTURE Levers to specific values, which may conflict with the AutoStart, so only run it while the autostart is disabled, using the fuel trigger which is linked to the autostart *)
++			(* This update forces the PROP &amp; MIXTURE Levers to specific values, which may conflict with the AutoStart, so only run it while the autostart is disabled, using the fuel trigger which is linked to the autostart *)
+ 			(A:FUELSYSTEM TRIGGER STATUS:1, Bool) ! if{
+@@ -2373,3 +2373,3 @@
+ 								</UPDATE_CODE>
+-							</Update>
++							</UseTemplate>
+ 						</Component>
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Fuel_Subtemplates.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Fuel_Subtemplates.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Fuel_Subtemplates.xml	2021-11-18 19:02:01.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Fuel_Subtemplates.xml	2021-11-27 00:40:01.000000000 +0200
+@@ -858,3 +858,3 @@
+ 				<Parameters Type="Override" Lifetime="Loop">
+-					<SELECTOR_STATE_COUNT_T Process="Int">#SELECTOR_STATE_COUNT_T# 1 +</SELECTOR_STATE_COUNT>
++					<SELECTOR_STATE_COUNT Process="Int">#SELECTOR_STATE_COUNT_T# 1 +</SELECTOR_STATE_COUNT>
+ 				</Parameters>
+@@ -1433,3 +1433,3 @@
+ 		<STR_STATE_#POS_HI_IDLE#>High_Idle</STR_STATE_#POS_HI_IDLE#>
+-		<STR_STATE_#POS_LO_IDLE#>Low_Idle</POS_LO_IDLE#POS_OFF#>
++		<STR_STATE_#POS_LO_IDLE#>Low_Idle</STR_STATE_#POS_LO_IDLE#>
+ 		<STR_STATE_#POS_CUT_OFF#>Cut_Off</STR_STATE_#POS_CUT_OFF#>
+@@ -1484,3 +1484,3 @@
+ 			<BINDING_INC_2>Mixture_Decr#SUFFIX_ID#</BINDING_INC_2>
+-			<BINDING_INC_2_PARAM_0>1</BINDING_INC_0_PARAM_2>
++			<BINDING_INC_2_PARAM_0>1</BINDING_INC_2_PARAM_0>
+ 			<BINDING_INC_2_EVENT_ID>MIXTURE#ID#_DECR</BINDING_INC_2_EVENT_ID>
+@@ -1488,3 +1488,3 @@
+ 			<BINDING_INC_3>CONDITION_LEVER_DEC</BINDING_INC_3>
+-			<BINDING_INC_3_PARAM_0>1</BINDING_INC_0_PARAM_3>
++			<BINDING_INC_3_PARAM_0>1</BINDING_INC_3_PARAM_0>
+ 			<BINDING_INC_3_EVENT_ID>CONDITION_LEVER_DEC</BINDING_INC_3_EVENT_ID>
+@@ -1492,3 +1492,3 @@
+ 			<BINDING_INC_4>CONDITION_LEVER#SUFFIX_ID#_DEC</BINDING_INC_4>
+-			<BINDING_INC_4_PARAM_0>1</BINDING_INC_0_PARAM_4>
++			<BINDING_INC_4_PARAM_0>1</BINDING_INC_4_PARAM_0>
+ 			<BINDING_INC_4_EVENT_ID>CONDITION_LEVER#SUFFIX_ID#_DEC</BINDING_INC_4_EVENT_ID>
+@@ -1496,3 +1496,3 @@
+ 			<BINDING_INC_5>Mixture_Decr#SUFFIX_ID#_Small</BINDING_INC_5>
+-			<BINDING_INC_5_PARAM_0>1</BINDING_INC_0_PARAM_5>
++			<BINDING_INC_5_PARAM_0>1</BINDING_INC_5_PARAM_0>
+ 			<BINDING_INC_5_EVENT_ID>MIXTURE#ID#_DECR_SMALL</BINDING_INC_5_EVENT_ID>
+@@ -1514,3 +1514,3 @@
+ 			<BINDING_DEC_3>CONDITION_LEVER_INC</BINDING_DEC_3>
+-			<BINDING_DEC_3_PARAM_0>1</BINDING_DEC_0_PARAM_3>
++			<BINDING_DEC_3_PARAM_0>1</BINDING_DEC_3_PARAM_0>
+ 			<BINDING_DEC_3_EVENT_ID>CONDITION_LEVER_INC</BINDING_DEC_3_EVENT_ID>
+@@ -1518,3 +1518,3 @@
+ 			<BINDING_DEC_4>CONDITION_LEVER#SUFFIX_ID#_INC</BINDING_DEC_4>
+-			<BINDING_DEC_4_PARAM_0>1</BINDING_DEC_0_PARAM_4>
++			<BINDING_DEC_4_PARAM_0>1</BINDING_DEC_4_PARAM_0>
+ 			<BINDING_DEC_4_EVENT_ID>CONDITION_LEVER#SUFFIX_ID#_INC</BINDING_DEC_4_EVENT_ID>
+@@ -1522,3 +1522,3 @@
+ 			<BINDING_DEC_5>Mixture_Incr#SUFFIX_ID#_Small</BINDING_DEC_5>
+-			<BINDING_DEC_5_PARAM_0>1</BINDING_DEC_0_PARAM_5>
++			<BINDING_DEC_5_PARAM_0>1</BINDING_DEC_5_PARAM_0>
+ 			<BINDING_DEC_5_EVENT_ID>MIXTURE#ID#_INCR_SMALL</BINDING_DEC_5_EVENT_ID>
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Handling_Subtemplates.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Handling_Subtemplates.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Common/Subtemplates/Handling_Subtemplates.xml	2021-11-18 19:02:01.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Common/Subtemplates/Handling_Subtemplates.xml	2021-11-27 00:40:53.000000000 +0200
+@@ -1764,3 +1764,3 @@
+ 							<ANIM_CODE_PUSH>(B:HANDLING_Spoilers_Extend, Bool) 100 *</ANIM_CODE_PUSH>
+-							<OVERRIDE_ANIM_CODE>(B:HANDLING_Spoilers) 100 *</ANIM_CODE>
++							<OVERRIDE_ANIM_CODE>(B:HANDLING_Spoilers) 100 *</OVERRIDE_ANIM_CODE>
+ 							<ON_STATE_CHANGED_EXTERNAL_CODE>(O:HANDLING_Spoilers_Position) #POS_STANDBY# != (B:HANDLING_Spoilers_Extend, Bool) and if{ #POS_STANDBY# (&gt;O:HANDLING_Spoilers_Position) }</ON_STATE_CHANGED_EXTERNAL_CODE>
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Generic/Helpers.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Generic/Helpers.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Generic/Helpers.xml	2020-12-22 21:43:36.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Generic/Helpers.xml	2021-11-26 23:39:18.000000000 +0200
+@@ -38,3 +38,3 @@
+ 		</Condition>
+-		<TEST_ID Process="Param">ID#NEXT_ID#</NEXT_ID>
++		<NEXT_ID Process="Param">ID#NEXT_ID#</NEXT_ID>
+ 	</OverrideTemplateParameters>
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Generic/Interactions.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Generic/Interactions.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Generic/Interactions.xml	2021-11-18 19:02:01.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Generic/Interactions.xml	2021-11-27 00:23:48.000000000 +0200
+@@ -2128,3 +2128,3 @@
+ 					</Condition>
+-					<AnimCursor min="#ANIMCURSOR_MIN#" max="#ANIMCURSOR_MAX#">#ANIMCURSOR_DIR#</AnimCursorDir>
++					<AnimCursorDir min="#ANIMCURSOR_MIN#" max="#ANIMCURSOR_MAX#">#ANIMCURSOR_DIR#</AnimCursorDir>
+ 					<Condition Check="ANIMTIP_LOOP">
+diff -rbU1 /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Generic/Updates.xml /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Generic/Updates.xml
+--- /Users/tml/OneStore/fs-base-aircraft-common/ModelBehaviorDefs/Asobo/Generic/Updates.xml	2020-12-22 21:43:36.000000000 +0200
++++ /Users/tml/Downloads/ModelBehaviorDefs/Asobo/Generic/Updates.xml	2021-11-27 00:25:15.000000000 +0200
+@@ -6,3 +6,3 @@
+ <!-- ####################################################################### -->
+-<!--
++
+ <!--
