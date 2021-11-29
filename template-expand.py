@@ -424,7 +424,7 @@ def expandusetemplate(siblings, ix, indent, file, params):
 
     template = templates.get(name)
     if not template:
-        fatal(indent, 'Calling undefined template "' + name + '"')
+        fatal('Calling undefined template "' + name + '"')
         
     defaults = template.find('DefaultTemplateParameters')
     if defaults:
