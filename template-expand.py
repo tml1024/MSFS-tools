@@ -526,7 +526,7 @@ def expand(elem, indent, file, params):
 
             kids.pop(ix)
 
-            if included.get(fullname):
+            if included.get(fullname.lower()):
                 pass
             else:
                 includedtree = parse(fullname)
@@ -541,7 +541,7 @@ def expand(elem, indent, file, params):
                 addix += 1
                 kids.insert(addix, filemarker(filestack[-1]))
                 addix += 1
-                included[fullname] = True
+                included[fullname.lower()] = True
                 verbose(indent, 'Included file "' + fullname + '"')
         elif kid.tag == 'Template':
             name = kid.get('Name')
