@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ModelInfo>
+	<LODS>
+		<LOD minSize="150" ModelFile="DA62_INTERIOR_LOD00.gltf"/>
+	</LODS>
+
+	<Behaviors>
+
+	<Include ModelBehaviorFile="Asobo\Common.xml"/>
+
+	<Component ID="INSTRUMENTS">
+		<UseTemplate Name="ASOBO_INSTRUMENT_Dial_Compass_Template">
+			<ANIM_WRAP>True</ANIM_WRAP>
+		</UseTemplate>
+		<CameraTitle>Overhead</CameraTitle>
+	</Component>
+	
+	</Behaviors>
+</ModelInfo>
