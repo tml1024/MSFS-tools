@@ -240,8 +240,8 @@ def evalexpr(elem, indent, params):
         if op.tag == 'And':
             if len(list(op)) != 2:
                 fatal('Operator element "And" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], params), params)
-            b = expandparamname(evalexpr(list(op)[1], params), params)
+            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
+            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
             if a == 'True' and b == 'True':
                 return 'True'
             else:
@@ -249,8 +249,8 @@ def evalexpr(elem, indent, params):
         elif op.tag == 'Or':
             if len(list(op)) != 2:
                 fatal('Operator element "Or" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], params), params)
-            b = expandparamname(evalexpr(list(op)[1], params), params)
+            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
+            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
             if a == 'True' or b == 'True':
                 return 'True'
             else:
@@ -258,7 +258,7 @@ def evalexpr(elem, indent, params):
         elif op.tag == 'Not':
             if len(list(op)) != 1:
                 fatal('Operator element "Not" should have only one child element')
-            a = expandparamname(evalexpr(list(op)[0], params), params)
+            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
             if a != 'True':
                 return 'True'
             else:
@@ -266,8 +266,8 @@ def evalexpr(elem, indent, params):
         elif op.tag == 'Greater':
             if len(list(op)) != 2:
                 fatal('Operator element "Greater" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], params), params)
-            b = expandparamname(evalexpr(list(op)[1], params), params)
+            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
+            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
             if int(a) > int(b):
                 return 'True'
             else:
@@ -275,8 +275,8 @@ def evalexpr(elem, indent, params):
         elif op.tag == 'Lower':
             if len(list(op)) != 2:
                 fatal('Operator element "Lower" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], params), params)
-            b = expandparamname(evalexpr(list(op)[1], params), params)
+            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
+            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
             if int(a) < int(b):
                 return 'True'
             else:
@@ -284,8 +284,8 @@ def evalexpr(elem, indent, params):
         elif op.tag == 'GreaterOrEqual':
             if len(list(op)) != 2:
                 fatal('Operator element "GreaterOrEqual" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], params), params)
-            b = expandparamname(evalexpr(list(op)[1], params), params)
+            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
+            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
             if int(a) >= int(b):
                 return 'True'
             else:
@@ -293,8 +293,8 @@ def evalexpr(elem, indent, params):
         elif op.tag == 'LowerOrEqual':
             if len(list(op)) != 2:
                 fatal('Operator element "LowerOrEqual" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], params), params)
-            b = expandparamname(evalexpr(list(op)[1], params), params)
+            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
+            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
             if int(a) <= int(b):
                 return 'True'
             else:
@@ -302,8 +302,8 @@ def evalexpr(elem, indent, params):
         elif op.tag == 'Equal':
             if len(list(op)) != 2:
                 fatal('Operator element "LowerOrEqual" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], params), params)
-            b = expandparamname(evalexpr(list(op)[1], params), params)
+            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
+            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
             if int(a) == int(b):
                 return 'True'
             else:
@@ -311,8 +311,8 @@ def evalexpr(elem, indent, params):
         elif op.tag == 'StringEqual':
             if len(list(op)) != 2:
                 fatal('Operator element "LowerOrEqual" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], params), params)
-            b = expandparamname(evalexpr(list(op)[1], params), params)
+            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
+            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
             if a == b:
                 return 'True'
             else:
@@ -340,7 +340,7 @@ def expandcondition(siblings, ix, indent, params):
         test = list(elem)[0]
         if test.tag != 'Test':
             fatal('Invalid "Condition" element with no attributes but without a Test element as first child')
-        success = evalexpr(test, params)
+        success = evalexpr(test, indent, params)
     else:
         success = evalcondition('Condition', siblings[ix], params)
     verbose(indent, '  Condition evaluates as ' + str(success))
@@ -388,7 +388,7 @@ def expandswitch(siblings, ix, indent, params):
                 fatal('"Switch" element has "Param" attribute but child "Case" element lacks "Value" attribute')
             if case.get('Valid') or case.get('Check') or case.get('NotEmpty') or case.get('Match') or case.get('Different'):
                 fatal('"Switch" element has "Param" attribute but child "Case" element has more attributes than just "Value"')
-            if param == expandparamname(case.get('Value')):
+            if param == expandparamname(case.get('Value'), params):
                 expansion = list(case)
                 break
     if expansion == None and len(defaults) == 1:
