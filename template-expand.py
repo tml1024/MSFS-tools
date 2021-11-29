@@ -549,7 +549,7 @@ def expand(elem, indent, file, params):
                 fatal('No Name attribute in "Template" element')
             if templates.get(name):
                 fatal('Multiply defined template "' + name + '"')
-            verbose(indent, 'Defined template "' + name)
+            verbose(indent, 'Defined template "' + name + '"')
             templates[name] = kid
             kids.pop(ix)
         elif kid.tag == 'InputEvent':
@@ -558,7 +558,7 @@ def expand(elem, indent, file, params):
                 fatal('No ID attribute in "InputEvent" element')
             if inputevents.get(id):
                 fatal('Multiply defined input event "' + id + '"')
-            verbose(indent, 'Defined input event "' + id)
+            verbose(indent, 'Defined input event "' + id + '"')
             inputevents[id] = kid
             kids.pop(ix)
         elif kid.tag == 'Condition':
