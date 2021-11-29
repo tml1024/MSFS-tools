@@ -10,3 +10,5 @@ Use: `python3 template-expand.py --verbose --include ~/Downloads/ModelBehaviorDe
 
 Where the `~/Downloads/ModelBehaviorDefs` is where I have copied the OneStore/fs-base-aircraft-common/ModelBehaviorDefs from MSFS and
 fixed the XML syntax errors in it. (The fixes I did are in `ModelBehaviorDefs-fixes.diff`.)
+
+So far input events aren't handled properly as I don't really understand yet how InputEvent, Presets, Preset and Extend elements work.
