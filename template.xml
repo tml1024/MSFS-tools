@@ -12,7 +12,7 @@
     <Condition Check="D3">
       <D3>#D3#</D3>
     </Condition>
-    <UseTemplate Name="T2">
+    <UseTemplate Name="#SECONDTEMPLATE#">
     </UseTemplate>
     <O2>#O2#</O2>
   </Template>
@@ -40,6 +40,7 @@
     <PLUGH>Plugh</PLUGH>
     <D1>CallOne</D1>
     <O2>CallTwo</O2>
+    <SECONDTEMPLATE>T2</SECONDTEMPLATE>
   </UseTemplate>
 
   <EXPECTED>
@@ -57,6 +58,7 @@
     <PLUGH>Plugh</PLUGH>
     <XYZZY>Xyzzy</XYZZY>
     <O2>CallTwo</O2>
+    <SECONDTEMPLATE>T2</SECONDTEMPLATE>
   </UseTemplate>
 
   <EXPECTED>
@@ -74,5 +76,6 @@
     <PLUGH>Foo</PLUGH>
     <O2>CallTwo</O2>
     <D3>CallThree</D3>
+    <SECONDTEMPLATE>T2</SECONDTEMPLATE>
   </UseTemplate>
 </Root>
