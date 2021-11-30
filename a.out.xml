@@ -1,0 +1,78 @@
+<ModelInfo>
+  <LODS>
+    <LOD minSize="150" ModelFile="DA62_INTERIOR_LOD00.gltf" />
+  </LODS>
+
+  <Behaviors>
+
+    <Macro Name="IsUsingRelativePos">(M:InputType) 1 ==</Macro>
+<Macro Name="DragLockResetTimer">0.05 0.10 @IsUsingRelativePos ?</Macro>
+
+<Macro Name="S16KToU16K">16384 + 2 /</Macro>
+	<Macro Name="S16KTo01">@S16KToU16K 16384 /</Macro>
+	<Macro Name="S16KToS1">16384 /</Macro>
+	<Macro Name="S1To01">1 + 2 /</Macro>
+	<Macro Name="16K">16384</Macro>
+	
+	<Macro Name="sprintf">(F:Format)</Macro>
+	<Macro Name="TT_Package">COCKPIT.TOOLTIPSV2</Macro>
+	
+	<Macro Name="TT_Placeholder_Title">' '</Macro>
+	<Macro Name="TT_Placeholder_Description">' '</Macro>
+	<Macro Name="TT_Placeholder_Value">' '</Macro>
+	<Macro Name="TT_OverrideMe_Title">' '</Macro>
+	<Macro Name="TT_OverrideMe_Description">' '</Macro>
+	<Macro Name="TT_OverrideMe_Value">' '</Macro>
+	
+	<Macro Name="TT_Empty">''</Macro>
+	<Macro Name="TT_On">(R:1:@TT_Package.GT_STATE_ON)</Macro>
+	<Macro Name="TT_Off">(R:1:@TT_Package.GT_STATE_OFF)</Macro>
+	<Macro Name="TT_Open">(R:1:@TT_Package.GT_STATE_OPEN)</Macro>
+	<Macro Name="TT_Closed">(R:1:@TT_Package.GT_STATE_CLOSE)</Macro>
+	<Macro Name="TT_Auto">(R:1:@TT_Package.GT_STATE_AUTO)</Macro>
+	<Macro Name="TT_Eng">(R:1:@TT_Package.GT_STATE_ENG)</Macro>
+	<Macro Name="TT_Right">(R:1:@TT_Package.GT_STATE_RIGHT)</Macro>
+	<Macro Name="TT_Left">(R:1:@TT_Package.GT_STATE_LEFT)</Macro>
+	<Macro Name="TT_Down">(R:1:@TT_Package.GT_STATE_DOWN)</Macro>
+	<Macro Name="TT_Both">(R:1:@TT_Package.GT_STATE_BOTH)</Macro>
+	<Macro Name="TT_NA">(R:1:@TT_Package.GT_STATE_NA)</Macro>
+	<Macro Name="TT_Start">(R:1:@TT_Package.GT_STATE_START)</Macro>
+	<Macro Name="TT_Test">(R:1:@TT_Package.GT_STATE_TEST)</Macro>
+	<Macro Name="TT_Standby">(R:1:@TT_Package.GT_STATE_STANDBY)</Macro>
+	<Macro Name="TT_Norm">(R:1:@TT_Package.GT_STATE_MODENORM)</Macro>
+	
+	<Macro Name="TT_OnOff_Cond">if{ @TT_On } els{ @TT_Off }</Macro>
+	
+	<Macro Name="FeatherPropPos">-0.25</Macro>
+	
+	
+	<Macro Name="UseIdlePosSnapAssistance">True</Macro>
+	<Macro Name="IdlePosSnapAssistance_MinTimebeforeReverse">0.5</Macro>
+	<Macro Name="IdlePosSnapAssistance_ThresholdHeldDetection">0.2</Macro>
+	
+	
+	
+	
+	
+	
+	<Component ID="INSTRUMENTS">
+      <Component ID="INSTRUMENT_Dial_Compass" Node="INSTRUMENT_Dial_Compass">
+			<Animation Name="INSTRUMENT_Dial_Compass" Guid="" Length="360" Type="Sim" TypeParam="AutoPlay">
+			<Parameter>
+				<Sim>
+					<Variable>WISKEY COMPASS INDICATION DEGREES</Variable>
+					<Units>degrees</Units>
+					<Scale>1</Scale>
+					<Bias>0</Bias>
+				</Sim>
+				<Lag>0</Lag>
+				<Wrap>True</Wrap>
+			</Parameter>
+		</Animation>
+
+		<PartID>INSTRUMENT_Dial_Compass</PartID>
+					</Component>
+	<CameraTitle>Overhead</CameraTitle>
+    </Component>
+  </Behaviors>
+</ModelInfo>

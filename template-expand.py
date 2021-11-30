@@ -513,12 +513,9 @@ def expandparameters(siblings, ix, indent, file, params):
         kids.pop(kidix)
         newkidix = kidix
         l = list(dummy)
-        if len(l) == 0:
-            kidix -= 1
-        else:
-            for i in list(dummy):
-                kids.insert(newkidix, i)
-                newkidix += 1
+        for i in list(dummy):
+            kids.insert(newkidix, i)
+            newkidix += 1
         if kidix == len(kids):
             break
         p = kids[kidix]
