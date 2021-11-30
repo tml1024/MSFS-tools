@@ -515,12 +515,11 @@ def expandparameters(siblings, ix, indent, file, params):
         if kidix == len(kids):
             break
         p = kids[kidix]
-        verbose(indent, kind + ' parameter ' + p.tag + ': "' + p.text + '"')
-        value = None
+        value = p.text
+        if value == None:
+            value = ''
+        verbose(indent, kind + ' parameter ' + p.tag + ': "' + value + '"')
         if kind == 'Override' or params.get(p.tag) == None:
-            value = p.text
-            if value == None:
-                value = ''
             process = p.get('Process')
             if process != None:
                 value = evalparam(value, process, indent, params)
