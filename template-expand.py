@@ -496,8 +496,15 @@ def expandparameters(siblings, ix, indent, file, params):
     elif elem.tag == 'OverrideTemplateParameters' \
          or (elem.tag == 'Parameters' and type == 'Override'):
         kind = 'Override'
+    elif elem.tag == 'EditableTemplateParameters':
+        kind = 'Editable'
     else:
         fatal('Unrecognized parameter list type ' + elemtostring(elem))
+
+    # No idea what EditableTemplateParameters mean, just skip it
+    if kind == 'Editable':
+        siblings.pop(ix)
+        return
 
     kids = list(elem)
     kidix = 0
@@ -550,7 +557,6 @@ def expand2(intemplate, elem, indent, file, params):
             filestack.pop()
             kids.pop(ix)
         elif kid.tag == 'Include':
-            addix = ix
             filename = kid.get('ModelBehaviorFile')
             if filename:
                 filename = cleanpathname(filename)
@@ -566,8 +572,9 @@ def expand2(intemplate, elem, indent, file, params):
             kids.pop(ix)
 
             if included.get(fullname.lower()):
-                pass
+                ix -= 1
             else:
+                addix = ix
                 includedtree = parse(fullname)
                 kids.insert(addix, filemarker(fullname))
                 addix += 1
@@ -615,15 +622,15 @@ def expand2(intemplate, elem, indent, file, params):
                   or kid.tag == 'OverrideTemplateParameters'):
             expandparameters(kids, ix, indent + 1, file, params)
         else:
-            expand(kid, indent, filestack[-1], params.copy())
+            kids[ix] = expand(kid, indent + 1, filestack[-1], params.copy())
             kids[ix].text = expandstring(kid.text, params)
             kids[ix].tail = expandstring(kid.tail, params)
             ix += 1
+
     # Now drop all original children of elem and insert the expanded children instead
     removechildren(elem)
     for kid in kids:
         elem.append(kid)
-
     return elem
         
 def expand(elem, indent, file, params):
