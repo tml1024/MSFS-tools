@@ -8,12 +8,13 @@
 
     <Include ModelBehaviorFile="Asobo\Common.xml"/>
 
+    <!-- Expand a simple template -->
+
     <Component ID="INSTRUMENTS">
       <UseTemplate Name="ASOBO_INSTRUMENT_Dial_Compass_Template">
 	<ANIM_WRAP>True</ANIM_WRAP>
       </UseTemplate>
       <CameraTitle>Overhead</CameraTitle>
     </Component>
-
   </Behaviors>
 </ModelInfo>
