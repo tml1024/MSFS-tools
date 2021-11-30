@@ -1,13 +1,13 @@
 <Root>
   Hello.
   <Template Name="Main">
-    <!-- Conditions without any attribute, and thus a Test child,
-         with no True or False children. Very simple Test trees.
-    -->
     <Condition>
       <Test>
 	<Arg Valid="NONEXISTENT"/>
       </Test>
+      <WRONG>Valid(NONEXISTENT)</WRONG>
+    </Condition>
+    <Condition Valid="NONEXISTENT">
       <WRONG>Valid(NONEXISTENT)</WRONG>
     </Condition>
     <Condition>
@@ -16,12 +16,19 @@
       </Test>
       <WRONG>Check(NONEXISTENT)</WRONG>
     </Condition>
+    <Condition Check="NONEXISTENT">
+      <WRONG>Check(NONEXISTENT)</WRONG>
+    </Condition>
     <Condition>
       <Test>
 	<Arg NotEmpty="NONEXISTENT"/>
       </Test>
       <WRONG>NotEmpty(NONEXISTENT)</WRONG>
     </Condition>
+    <Condition NotEmpty="NONEXISTENT">
+      <WRONG>NotEmpty(NONEXISTENT)</WRONG>
+    </Condition>
+
     <!-- No idea whether using a nonexistent parameter in the Check
          attribute is supposed to match an empty string or what, so
          bypassing these checks for now. Intuitively, a nonexitent
@@ -53,11 +60,24 @@
 	<CORRECT>Valid(PLUGH)</CORRECT>
       </True>
     </Condition>
+    <Condition Valid="PLUGH">
+      <True>
+	<CORRECT>Valid(PLUGH)</CORRECT>
+      </True>
+    </Condition>
 
     <Condition>
       <Test>
 	<Arg Valid="EMPTY"/>
       </Test>
+      <True>
+	<WRONG>Valid(EMPTY)</WRONG>
+      </True>
+      <False>
+	<CORRECT>Not Valid(EMPTY)</CORRECT>
+      </False>
+    </Condition>
+    <Condition Valid="EMPTY">
       <True>
 	<WRONG>Valid(EMPTY)</WRONG>
       </True>
@@ -85,10 +105,16 @@
       </Test>
       <CORRECT>Check(EMPTY) and Match("")</CORRECT>
     </Condition>
+    <Condition Check="EMPTY" Match="">
+      <CORRECT>Check(EMPTY) and Match("")</CORRECT>
+    </Condition>
     <Condition>
       <Test>
 	<Arg Check="EMPTY" Different=""/>
       </Test>
+      <WRONG>Check(EMPTY) and Different=("")</WRONG>
+    </Condition>
+    <Condition Check="EMPTY" Different="">
       <WRONG>Check(EMPTY) and Different=("")</WRONG>
     </Condition>
     <Condition>
@@ -128,10 +154,16 @@
       </Test>
       <WRONG>Check(ZERO) and Match("")</WRONG>
     </Condition>
+    <Condition Check="ZERO" Match="">
+      <WRONG>Check(ZERO) and Match("")</WRONG>
+    </Condition>
     <Condition>
       <Test>
 	<Arg Check="ZERO" Different=""/>
       </Test>
+      <CORRECT>Check(ZERO) and Different("")</CORRECT>
+    </Condition>
+    <Condition Check="ZERO" Different="">
       <CORRECT>Check(ZERO) and Different("")</CORRECT>
     </Condition>
 
@@ -141,16 +173,25 @@
       </Test>
       <WRONG>Valid(FALSE)</WRONG>
     </Condition>
+    <Condition Valid="FALSE">
+      <WRONG>Valid(FALSE)</WRONG>
+    </Condition>
     <Condition>
       <Test>
 	<Arg Check="FALSE"/>
       </Test>
       <CORRECT>Check(FALSE)</CORRECT>
     </Condition>
+    <Condition Check="FALSE">
+      <CORRECT>Check(FALSE)</CORRECT>
+    </Condition>
     <Condition>
       <Test>
 	<Arg NotEmpty="FALSE"/>
       </Test>
+      <CORRECT>NotEmpty(FALSE)</CORRECT>
+    </Condition>
+    <Condition NotEmpty="FALSE">
       <CORRECT>NotEmpty(FALSE)</CORRECT>
     </Condition>
     <Condition>
