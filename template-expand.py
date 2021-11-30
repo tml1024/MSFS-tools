@@ -376,7 +376,7 @@ def expandswitch(siblings, ix, indent, params):
             numdefaults = 'no "Default" children'
         else:
             numdefaults = 'one "Default" child'
-        verbose(indent, 'Expanding "Switch" element with params ' + str(params))
+        verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + numdefaults + ' with ' + str(params))
         writeelement(elem)
     param = elem.get('Param')
     if param:
@@ -394,14 +394,68 @@ def expandswitch(siblings, ix, indent, params):
     if expansion == None and len(defaults) == 1:
         expansion = list(defaults[0])
     siblings.pop(ix)
-    for i in expansion:
-        siblings.insert(ix, i)
-        ix += 1
+    if expansion != None:
+        for i in expansion:
+            siblings.insert(ix, i)
+            ix += 1
+
+def expandloop(siblings, ix, indent, params):
+    elem = siblings[ix]
+    writeelement(elem)
+    l = elem.findall('Setup')
+    if len(l) == 0:
+        fatal('"Loop" element with no "Setup" child')
+    if len(l) > 1:
+        fatal('"Loop" element with more than one "Setup" child')
+    setup = l[0]
+    l = elem.findall('Do')
+    if len(l) == 0:
+        fatal('"Loop" element with no "Do" child')
+    if len(l) > 1:
+        fatal('"Loop" element with more than one "Do" child')
+    do = l[0]
+    l = elem.findall('Then')
+    if len(l) > 1:
+        fatal('"Loop" element with more than one "Then" child')
+    then = None
+    if len(l) == 1:
+        then = len[0]
+    params = params.copy()
+    if len(setup.findall('Param')) != 1 or len(setup.findall('From')) != 1 or len(setup.findall('Inc')) != 1 \
+       or len(setup.findall('To')) > 1 or len(setup.findall('While')) > 1 \
+       or (len(setup.findall('To')) == 1 and len(setup.findall('While')) == 1):
+        fatal('"Loop" element syntax error')
+
+    var = setup.find('Param').text
+    initialval = setup.find('From').text
+    params[var] = initialval
+    inc = int(setup.find('Inc').text)
+    to = setup.find('To')
+    if to != None:
+        to = int(to.text)
+    hwile = setup.find('While')
+
+    loopvar = int(initialval)
+    numiters = 0
+
+    siblings.pop(ix)
+    while True:
+        verbose(indent, 'Loop iteration ' + str(numiters) + ' var=' + str(loopvar) + ' to=' + str(to) + ' while=' + str(hwile))
+        for i in list(do):
+            siblings.insert(ix, i)
+            ix += 1
+        numiters += 1
+        if to == None and hwile == None and numiters == 64:
+            break
+        loopvar += inc
+        if to != None and loopvar == to:
+            break
+        if hwile != None:
+            if evalexpr(hwile, indent, params) == 'False':
+                break
 
 def expandusetemplate(siblings, ix, indent, file, params):
     elem = siblings[ix]
-    name = elem.get('Name')
-    verbose(indent, 'Expanding template "' + name + '" with ' + str(params))
 
     # Handle the arguments provided at the call site
     args = list(elem)
@@ -422,6 +476,12 @@ def expandusetemplate(siblings, ix, indent, file, params):
             params[arg.tag] = value
         argix += 1
 
+    name = elem.get('Name')
+    if not name:
+        fatal('No Name attribute in UseTemplate element')
+    name = expandstring(name, params)
+    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(params))
+
     template = templates.get(name)
     if not template:
         fatal('Calling undefined template "' + name + '"')
@@ -438,7 +498,11 @@ def expandusetemplate(siblings, ix, indent, file, params):
             while defix < len(defs):
                 p = defs[defix]
                 if p.tag == 'Condition':
-                  expandcondition(defs, defix, indent, params)  
+                    expandcondition(defs, defix, indent, params)
+                elif p.tag == 'Switch':
+                    expandswitch(defs, defix, indent, params)
+                elif p.tag == 'Loop':
+                    expandloop(defs, defix, indent, params)
                 else:
                     if not params.get(p.tag):
                         value = p.text
@@ -566,10 +630,6 @@ def expand(elem, indent, file, params):
         elif kid.tag == 'Switch':
             expandswitch(kids, ix, indent, params)
         elif kid.tag == 'UseTemplate':
-            name = kid.get('Name')
-            if not name:
-                fatal('No Name attribute in UseTemplate element')
-            name = expandstring(name, params)
             expandusetemplate(kids, ix, indent + 1, filestack[-1], params.copy())
         elif kid.tag == 'Parameters' or kid.tag == 'DefaultTemplateParameters' or kid.tag == 'EditableTemplateParameters' or kid.tag == 'OverrideTemplateParameters':
             kids.pop(ix)
