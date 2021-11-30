@@ -1,0 +1,57 @@
+<Root>
+  <EXPECTED>
+    <PLUGH>Plugh</PLUGH>
+    <D1>CallOne</D1>
+    <O2>CallTwo</O2>
+    <PLUGH>Plugh</PLUGH>
+    <D1>CallOne</D1>
+    <O2>OverrideTwo</O2>
+    <O2>CallTwo</O2>
+  </EXPECTED>
+
+  <PLUGH>Plugh</PLUGH>
+    <D1>CallOne</D1>
+    <O2>CallTwo</O2>
+    <PLUGH>Plugh</PLUGH>
+    <D1>CallOne</D1>
+    <O2>OverrideTwo</O2>
+  <O2>CallTwo</O2>
+  <EXPECTED>
+    <PLUGH>Plugh</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>CallTwo</O2>
+    <D3>DefaultThree</D3>
+    <PLUGH>Plugh</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>OverrideTwo</O2>
+    <O2>CallTwo</O2>
+  </EXPECTED>
+
+  <PLUGH>Plugh</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>CallTwo</O2>
+    <D3>DefaultThree</D3>
+    <PLUGH>Plugh</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>OverrideTwo</O2>
+  <O2>CallTwo</O2>
+  <EXPECTED>
+    <PLUGH>Foo</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>CallTwo</O2>
+    <D3>CallThree</D3>
+    <PLUGH>Foo</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>OverrideTwo</O2>
+    <O2>CallTwo</O2>
+  </EXPECTED>
+
+  <PLUGH>Foo</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>CallTwo</O2>
+    <D3>CallThree</D3>
+    <PLUGH>Foo</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>OverrideTwo</O2>
+  <O2>CallTwo</O2>
+  </Root>

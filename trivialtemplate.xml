@@ -1,0 +1,14 @@
+<Root>
+  <Template Name="T1">
+    <DefaultTemplateParameters>
+      <D1>DefaultOne</D1>
+    </DefaultTemplateParameters>
+    <D1>#D1#</D1>
+  </Template>
+
+  <UseTemplate Name="T1">
+    <D1>CallOne</D1>
+  </UseTemplate>
+
+  <UseTemplate Name="T1"/>
+</Root>

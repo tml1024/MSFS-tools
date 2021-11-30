@@ -1,0 +1,78 @@
+<Root>
+  <Template Name="T1">
+    <DefaultTemplateParameters>
+      <D1>DefaultOne</D1>
+      <Condition Check="XYZZY">
+	<D3>DefaultThree</D3>
+      </Condition>
+    </DefaultTemplateParameters>
+    <PLUGH>#PLUGH#</PLUGH>
+    <D1>#D1#</D1>
+    <O2>#O2#</O2>
+    <Condition Check="D3">
+      <D3>#D3#</D3>
+    </Condition>
+    <UseTemplate Name="T2">
+    </UseTemplate>
+    <O2>#O2#</O2>
+  </Template>
+
+  <Template Name="T2">
+    <OverrideTemplateParameters>
+      <O2>OverrideTwo</O2>
+    </OverrideTemplateParameters>
+    <PLUGH>#PLUGH#</PLUGH>
+    <D1>#D1#</D1>
+    <O2>#O2#</O2>
+  </Template>
+
+  <EXPECTED>
+    <PLUGH>Plugh</PLUGH>
+    <D1>CallOne</D1>
+    <O2>CallTwo</O2>
+    <PLUGH>Plugh</PLUGH>
+    <D1>CallOne</D1>
+    <O2>OverrideTwo</O2>
+    <O2>CallTwo</O2>
+  </EXPECTED>
+
+  <UseTemplate Name="T1">
+    <PLUGH>Plugh</PLUGH>
+    <D1>CallOne</D1>
+    <O2>CallTwo</O2>
+  </UseTemplate>
+
+  <EXPECTED>
+    <PLUGH>Plugh</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>CallTwo</O2>
+    <D3>DefaultThree</D3>
+    <PLUGH>Plugh</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>OverrideTwo</O2>
+    <O2>CallTwo</O2>
+  </EXPECTED>
+
+  <UseTemplate Name="T1">
+    <PLUGH>Plugh</PLUGH>
+    <XYZZY>Xyzzy</XYZZY>
+    <O2>CallTwo</O2>
+  </UseTemplate>
+
+  <EXPECTED>
+    <PLUGH>Foo</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>CallTwo</O2>
+    <D3>CallThree</D3>
+    <PLUGH>Foo</PLUGH>
+    <D1>DefaultOne</D1>
+    <O2>OverrideTwo</O2>
+    <O2>CallTwo</O2>
+  </EXPECTED>
+
+  <UseTemplate Name="T1">
+    <PLUGH>Foo</PLUGH>
+    <O2>CallTwo</O2>
+    <D3>CallThree</D3>
+  </UseTemplate>
+</Root>

@@ -45,11 +45,11 @@ def verbose(indent, string):
     if args.verbose:
         s = ''
         for i in range(indent):
-            s += '  '
+            s += '    '
         print(s + string, file=sys.stderr)
 
 def fatal(string):
-    print(string, file=sys.stderr)
+    print('\n' + string, file=sys.stderr)
     exit(1)
 
 def filemarker(path):
@@ -102,6 +102,14 @@ def shallowcopyelement(elem):
     result.tail = elem.tail
     return result
 
+def deepcopytree(root):
+    root = shallowcopyelement(root)
+    kids = list(root)
+    removechildren(root)
+    for kid in list(kids):
+        root.append(deepcopytree(kid))
+    return root
+
 def elide(elem, tag):
     result = [ ]
     if elem.tag == tag:
@@ -134,7 +142,8 @@ def expandstring(string, params):
     string = re.sub('__HASH__' + IDENTIFIER + '__HSAH__', '', string)
     return string
 
-def expandparameters(elem, params):
+def expandparametersinelem(elem, params):
+    return elem
     elem.tag = expandstring(elem.tag, params)
     elem.text = expandstring(elem.text, params)
     elem.tail = expandstring(elem.tail, params)
@@ -147,7 +156,7 @@ def expandparameters(elem, params):
     for key, value in newattribs.items():
         elem.set(key, value)
     for i in list(elem):
-        expandparameters(i, params.copy())
+        expandparametersinelem(i, params.copy())
     return elem
 
 def evalrpn(rpn, kind, indent, params):
@@ -250,7 +259,7 @@ def evalexpr(elem, indent, params):
     verbose(indent, 'Evaluating expression:')
     if args.verbose:
         writeelement(elem)
-    verbose(0, '  with params: ' + str(params))
+    verbose(0, ' with params: ' + str(params))
     if len(list(elem)) == 0:
         return elem.text
     elif len(list(elem)) == 1:
@@ -358,25 +367,25 @@ def expandcondition(siblings, ix, indent, params):
         success = evalexpr(test, indent, params)
     else:
         success = evalcondition('Condition', siblings[ix], params)
-    verbose(indent, '  Condition evaluates as ' + str(success))
+    verbose(indent, ' Condition evaluates as ' + str(success))
     siblings.pop(ix)
     if success == 'True':
         if len(trues) == 1:
             for i in list(trues[0]):
-                verbose(indent, '  Inserting subelement of "True" child: ' + elemtostring(i))
+                verbose(indent, ' Inserting subelement of "True" child: ' + elemtostring(i))
                 siblings.insert(ix, i)
                 ix += 1
         else:
             for i in list(elem):
                 if i.tag == 'Test':
                     continue
-                verbose(indent, '  Inserting child: ' + elemtostring(i))
+                verbose(indent, ' Inserting child: ' + elemtostring(i))
                 siblings.insert(ix, i)
                 ix += 1
     else:
         if len(falses) == 1:
             for i in list(falses[0]):
-                verbose(indent, '  Inserting subelement of "False" child: ' + elemtostring(i))
+                verbose(indent, ' Inserting subelement of "False" child: ' + elemtostring(i))
                 siblings.insert(ix, i)
                 ix += 1
 
@@ -472,107 +481,89 @@ def expandloop(siblings, ix, indent, params):
 
 def expandusetemplate(siblings, ix, indent, file, params):
     elem = siblings[ix]
-
-    # Handle the arguments provided at the call site
-    args = list(elem)
-    argix = 0
-    while argix < len(args):
-        arg = args[argix]
-        if arg.tag == 'Condition':
-            expandcondition(args, argix, indent, params)
-        else:
-            if arg.text != None:
-                value = arg.text
-            else:
-                value = ''
-            process = arg.get('Process')
-            if process != None:
-                value = evalparam(value, process, indent, params)
-            verbose(indent, '  Argument ' + arg.tag + ': "' + value + '"')
-            params[arg.tag] = value
-        argix += 1
+    params = params.copy()
 
     name = elem.get('Name')
     if not name:
         fatal('No Name attribute in UseTemplate element')
     name = expandstring(name, params)
-    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(params))
 
+    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(params))
     template = templates.get(name)
     if not template:
-        fatal('Calling undefined template "' + name + '"')
+        fatal('Expanding undefined template "' + name + '"')
         
-    defaults = template.find('DefaultTemplateParameters')
-    if defaults:
-        defaults = [ defaults ]
-    if not defaults:
-        defaults = template.findall("./Parameters[@Type='Default']")
-    if defaults:
-        for d in defaults:
-            defs = list(d)
-            defix = 0
-            while defix < len(defs):
-                p = defs[defix]
-                if p.tag == 'Condition':
-                    expandcondition(defs, defix, indent, params)
-                elif p.tag == 'Switch':
-                    expandswitch(defs, defix, indent, params)
-                elif p.tag == 'Loop':
-                    expandloop(defs, defix, indent, params)
-                else:
-                    if not params.get(p.tag):
-                        value = p.text
-                        if value == None:
-                            value = ''
-                        process = p.get('Process')
-                        if process != None:
-                            value = evalparam(value, process, indent, params)
-                        verbose(indent, '  Default parameter ' + p.tag + ': "' + value + '"')
-                        params[p.tag] = value
-                    else:
-                        verbose(indent, '  (Default parameter ' + p.tag + ' already provided in call stack)')
-                    defix += 1
+    # Handle the arguments provided at the call site
+    expand(elem, indent, file, params)
 
-    overrides = template.find('OverrideTemplateParameters')
-    if overrides:
-        overrides = [ overrides ]
-    if not overrides:
-        overrides = template.findall("./Parameters[@Type='Override']")
-    if overrides:
-        for o in overrides:
-            ovs = list(o)
-            ovix = 0
-            while ovix < len(ovs):
-                p = ovs[ovix]
-                if p.text != None:
-                    value = p.text
-                else:
-                    value = None
-                process = p.get('Process')
-                if process != None:
-                    value = evalparam(value, process, indent, params)
-                overridden = False
-                if params.get(p.tag):
-                    overridden = True
-                    if value == None:
-                        verbose(indent, '  Parameter ' + p.tag + ' removed')
-                    else:
-                        verbose(indent, '  Parameter ' + p.tag + ' overridden as: "' + value + '"')
-                params[p.tag] = value
-                if not overridden:
-                    verbose(indent, '  Parameter ' + p.tag + ': "' + value + '"')
-                ovix += 1
+    for arg in list(elem):
+        if arg.text != None:
+            value = arg.text
+        else:
+            value = ''
+        process = arg.get('Process')
+        if process != None:
+            value = evalparam(value, process, indent, params)
+        verbose(indent, ' Call parameter ' + arg.tag + ': "' + value + '"')
+        params[arg.tag] = value
 
-    verbose(indent, '  Popping element at ' + str(ix) + ': ' + elemtostring(siblings[ix]))
+    template = deepcopytree(template)
+    template = expandintemplate(template, indent, file, params)
+
+    verbose(indent, ' Popping element at ' + str(ix) + ': ' + elemtostring(siblings[ix]))
     siblings.pop(ix)
-    expand(template, indent + 1, file, params)
     for c in list(template):
         c = shallowcopyelement(c)
+        verbose(indent, ' Inserting element at ' + str(ix) + ' from template expansion:' + elemtostring(c))
         siblings.insert(ix, expand(c, indent + 1, file, params))
-        verbose(indent, '  Inserted element at ' + str(ix) + ' from template expansion:' + elemtostring(siblings[ix]))
         ix += 1
 
-def expand(elem, indent, file, params):
+def expandparameters(siblings, ix, indent, file, params):
+    elem = siblings[ix]
+    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(params))
+    type = elem.get('Type')
+    if elem.tag == 'DefaultTemplateParameters' \
+       or (elem.tag == 'Parameters' and type == 'Default'):
+        kind = 'Default'
+    elif elem.tag == 'OverrideTemplateParameters' \
+         or (elem.tag == 'Parameters' and type == 'Override'):
+        kind = 'Override'
+    else:
+        fatal('Unrecognized parameter list type ' + elemtostring(elem))
+
+    kids = list(elem)
+    kidix = 0
+    while kidix < len(kids):
+        dummy = expandtomany(kids[kidix], indent, file, params)
+        kids.pop(kidix)
+        newkidix = kidix
+        l = list(dummy)
+        if len(l) == 0:
+            kidix -= 1
+        else:
+            for i in list(dummy):
+                kids.insert(newkidix, i)
+                newkidix += 1
+        if kidix == len(kids):
+            break
+        p = kids[kidix]
+        verbose(indent, kind + ' parameter ' + p.tag + ': "' + p.text + '"')
+        value = None
+        if kind == 'Override' or params.get(p.tag) == None:
+            value = p.text
+            if value == None:
+                value = ''
+            process = p.get('Process')
+            if process != None:
+                value = evalparam(value, process, indent, params)
+            params[p.tag] = value
+        else:
+            verbose(indent, ' (Default parameter ' + p.tag + ' already provided in call stack)')
+        kidix += 1
+    verbose(indent, 'Popping element at ' + str(ix) + ': ' + elemtostring(elem))
+    siblings.pop(ix)
+
+def expand2(intemplate, elem, indent, file, params):
     didany = True
     kids = list(elem)
     verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(len(kids)) + ' children')
@@ -583,7 +574,7 @@ def expand(elem, indent, file, params):
         elem.set(i, expandstring(elem.get(i), params))
 
     while ix < len(kids):
-        verbose(indent, 'kids[' + str(ix) + '] is ' + elemtostring(kids[ix]))
+        verbose(indent, ' kids[' + str(ix) + '] is ' + elemtostring(kids[ix]))
         kid = shallowcopyelement(kids[ix])
         if kid.tag == 'FILE':
             filestack.append(kid.get('Path'))
@@ -649,9 +640,13 @@ def expand(elem, indent, file, params):
         elif kid.tag == 'Loop':
             expandloop(kids, ix, indent, params)
         elif kid.tag == 'UseTemplate':
-            expandusetemplate(kids, ix, indent + 1, filestack[-1], params.copy())
-        elif kid.tag == 'Parameters' or kid.tag == 'DefaultTemplateParameters' or kid.tag == 'EditableTemplateParameters' or kid.tag == 'OverrideTemplateParameters':
-            kids.pop(ix)
+            expandusetemplate(kids, ix, indent + 1, filestack[-1], params)
+        elif intemplate \
+             and (kid.tag == 'Parameters' \
+                  or kid.tag == 'DefaultTemplateParameters' \
+                  or kid.tag == 'EditableTemplateParameters' \
+                  or kid.tag == 'OverrideTemplateParameters'):
+            expandparameters(kids, ix, indent + 1, file, params)
         else:
             expand(kid, indent, filestack[-1], params.copy())
             kids[ix].text = expandstring(kid.text, params)
@@ -664,6 +659,18 @@ def expand(elem, indent, file, params):
 
     return elem
         
+def expand(elem, indent, file, params):
+    return expand2(False, elem, indent, file, params)
+
+def expandtomany(elem, indent, file, params):
+    dummy = ET.Element('DUMMY')
+    dummy.append(elem)
+    return expand2(False, dummy, indent, file, params)
+
+def expandintemplate(elem, indent, file, params):
+    return expand2(True, elem, indent, file, params)
+
+
 # Load the input file
 tree = parse(args.input)
 
