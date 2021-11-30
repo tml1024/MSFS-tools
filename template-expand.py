@@ -33,6 +33,9 @@ if args.includedir:
 if os.path.dirname(args.input) == '':
     args.input = './' + args.input
 
+NUMBER = r'-?\d+(?:\.\d+)?'
+IDENTIFIER = r'[_A-Za-z][_A-Za-z0-9]+'
+
 templates = { }
 inputevents = { }
 
@@ -76,7 +79,7 @@ def elemtostring(elem):
 def parse(filename):
     with open(filename, 'r') as f:
         data = f.read()
-        data = re.sub(r'#([A-Z0-9_]+)#', r'__HASHSTART__\1__ENDHASH__', data)
+        data = re.sub('#(' + IDENTIFIER + ')#', r'__HASH__\1__HSAH__', data)
         return ET.fromstring(data)
     return None
 
@@ -123,10 +126,12 @@ def expandparamname(name, params):
 def expandstring(string, params):
     if string == None:
         return None
-    if string.find('__HASHSTART__') == -1:
+    if string.find('__HASH__') == -1:
         return string
     for key, value in params.items():
-        string = re.sub('__HASHSTART__' + key + '__ENDHASH__', value, string)
+        string = re.sub('__HASH__' + key + '__HSAH__', value, string)
+    # Remove unexpanded leftover parameter referenced
+    string = re.sub('__HASH__' + IDENTIFIER + '__HSAH__', '', string)
     return string
 
 def expandparameters(elem, params):
@@ -146,15 +151,13 @@ def expandparameters(elem, params):
     return elem
 
 def evalrpn(rpn, kind, indent, params):
-    NUMBER = r'-?\d+(?:\.\d+)?'
-    IDENTIFIER = r'[_A-Za-z][_A-Za-z0-9]+'
     tokens = re.findall(NUMBER + '|' + IDENTIFIER + '|' + r'-?\d+(?:\.\d+)?|[_A-Za-z][_A-Za-z0-9]+|\+|-|\*|/', rpn)
     stack = []
     for token in tokens:
         if re.fullmatch(NUMBER, token):
             stack.append(float(token))
         elif re.fullmatch(IDENTIFIER, token):
-            match = re.fullmatch('__HASHSTART__(' + IDENTIFIER + ')__ENDHASH__', token) 
+            match = re.fullmatch('__HASH__(' + IDENTIFIER + ')__HSAH__', token) 
             if not match:
                 fatal('Invalid identifier in RPN expression: ' + token)
             param = match.group(1)
@@ -401,7 +404,7 @@ def expandswitch(siblings, ix, indent, params):
 
 def expandloop(siblings, ix, indent, params):
     elem = siblings[ix]
-    writeelement(elem)
+    params = params.copy()
     l = elem.findall('Setup')
     if len(l) == 0:
         fatal('"Loop" element with no "Setup" child')
@@ -420,7 +423,6 @@ def expandloop(siblings, ix, indent, params):
     then = None
     if len(l) == 1:
         then = len[0]
-    params = params.copy()
     if len(setup.findall('Param')) != 1 or len(setup.findall('From')) != 1 or len(setup.findall('Inc')) != 1 \
        or len(setup.findall('To')) > 1 or len(setup.findall('While')) > 1 \
        or (len(setup.findall('To')) == 1 and len(setup.findall('While')) == 1):
@@ -428,7 +430,6 @@ def expandloop(siblings, ix, indent, params):
 
     var = setup.find('Param').text
     initialval = setup.find('From').text
-    params[var] = initialval
     inc = int(setup.find('Inc').text)
     to = setup.find('To')
     if to != None:
@@ -436,23 +437,29 @@ def expandloop(siblings, ix, indent, params):
     hwile = setup.find('While')
 
     loopvar = int(initialval)
+    params[var] = str(loopvar)
     numiters = 0
 
     siblings.pop(ix)
     while True:
-        verbose(indent, 'Loop iteration ' + str(numiters) + ' var=' + str(loopvar) + ' to=' + str(to) + ' while=' + str(hwile))
         for i in list(do):
+            i = shallowcopyelement(i)
+            i.text = expandstring(i.text, params)
+            i.tail = expandstring(i.tail, params)
             siblings.insert(ix, i)
             ix += 1
         numiters += 1
         if to == None and hwile == None and numiters == 64:
             break
         loopvar += inc
-        if to != None and loopvar == to:
+        params[var] = str(loopvar)
+        if to != None and ((inc > 0 and loopvar >= to) or (inc < 0 and loopvar <= to)):
             break
         if hwile != None:
             if evalexpr(hwile, indent, params) == 'False':
                 break
+    # Set the tail of the original Loop element to the last of the inserted elements
+    siblings[ix-1].tail = elem.tail
 
 def expandusetemplate(siblings, ix, indent, file, params):
     elem = siblings[ix]
@@ -562,12 +569,13 @@ def expand(elem, indent, file, params):
     kids = list(elem)
     ix = 0
     filestack = [ file ]
+
     for i in elem.keys():
         elem.set(i, expandstring(elem.get(i), params))
 
     while ix < len(kids):
         verbose(indent, 'kids[' + str(ix) + '] is ' + elemtostring(kids[ix]))
-        kid = kids[ix]
+        kid = shallowcopyelement(kids[ix])
         if kid.tag == 'FILE':
             filestack.append(kid.get('Path'))
             kids.pop(ix)
@@ -629,15 +637,17 @@ def expand(elem, indent, file, params):
             expandcondition(kids, ix, indent, params)
         elif kid.tag == 'Switch':
             expandswitch(kids, ix, indent, params)
+        elif kid.tag == 'Loop':
+            expandloop(kids, ix, indent, params)
         elif kid.tag == 'UseTemplate':
             expandusetemplate(kids, ix, indent + 1, filestack[-1], params.copy())
         elif kid.tag == 'Parameters' or kid.tag == 'DefaultTemplateParameters' or kid.tag == 'EditableTemplateParameters' or kid.tag == 'OverrideTemplateParameters':
             kids.pop(ix)
         else:
             expand(kid, indent, filestack[-1], params.copy())
-            kid.text = expandstring(kid.text, params)
-            kid.tail = expandstring(kid.tail, params)
-            ix += 1
+            kids[ix].text = expandstring(kid.text, params)
+            kids[ix].tail = expandstring(kid.tail, params)
+        ix += 1
     # Now drop all original children of elem and insert the expanded children instead
     removechildren(elem)
     for kid in kids:
@@ -652,3 +662,4 @@ tree = parse(args.input)
 expand(tree, 0, args.input, { })
 
 ET.ElementTree(tree).write(sys.stdout, encoding='Unicode')
+sys.stdout.write('\n')

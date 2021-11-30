@@ -1,0 +1,13 @@
+<Root>
+  
+  Hello.
+  <Foo>12</Foo>
+    <Foo>14</Foo>
+  
+  <Bar>4</Bar>
+    <Bar>1</Bar>
+    <Bar>-2</Bar>
+   
+  
+  Bye.
+</Root>

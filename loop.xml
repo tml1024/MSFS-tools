@@ -1,0 +1,32 @@
+<Root>
+  <!-- Loop with an increment larger than one to verify that the loop
+       ends even if the limit is not reached exactly.
+  -->
+  Hello.
+  <Loop>
+    <Setup>
+      <Param>FOO</Param>
+      <From>12</From>
+      <Inc>2</Inc>
+      <To>15</To>
+    </Setup>
+    <Do>
+      <Foo>#FOO#</Foo>
+    </Do>
+  </Loop>
+  <!-- Loop downwards -->
+  <Loop>
+    <Setup>
+      <Param>BAR</Param>
+      <From>4</From>
+      <Inc>-3</Inc>
+      <To>-4</To>
+    </Setup>
+    <Do>
+      <Bar>#BAR#</Bar>
+    </Do>
+  </Loop>
+  #FOO# <!-- Should not have any value -->
+  #BAR#
+  Bye.
+</Root>
