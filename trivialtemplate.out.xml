@@ -1,4 +1,6 @@
 <Root>
   <D1>CallOne</D1>
+    <FOO Bar="CallOne" />
   <D1>DefaultOne</D1>
+    <FOO Bar="DefaultOne" />
   </Root>

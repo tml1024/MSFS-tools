@@ -4,6 +4,7 @@
       <D1>DefaultOne</D1>
     </DefaultTemplateParameters>
     <D1>#D1#</D1>
+    <FOO Bar="#D1#"/>
   </Template>
 
   <UseTemplate Name="T1">

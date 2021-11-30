@@ -541,12 +541,12 @@ def expand2(intemplate, elem, indent, file, params):
     ix = 0
     filestack = [ file ]
 
-    for i in elem.keys():
-        elem.set(i, expandstring(elem.get(i), params))
-
     while ix < len(kids):
         verbose(indent, ' kids[' + str(ix) + '] is ' + elemtostring(kids[ix]))
         kid = shallowcopyelement(kids[ix])
+        for i in kid.keys():
+            kid.set(i, expandstring(kid.get(i), params))
+
         if kid.tag == 'FILE':
             filestack.append(kid.get('Path'))
             kids.pop(ix)
