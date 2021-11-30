@@ -1,0 +1,25 @@
+<Root>
+  Hello.
+  <CORRECT>Valid(PLUGH)</CORRECT>
+      <CORRECT>Not Valid(EMPTY)</CORRECT>
+      <CORRECT>Check(EMPTY)</CORRECT>
+    <CORRECT>Not NotEmpty(EMPTY)</CORRECT>
+      <CORRECT>Check(EMPTY) and Match("")</CORRECT>
+    <CORRECT>Check(EMPTY) and Different=("Something)</CORRECT>
+    <CORRECT>Check(ZERO)</CORRECT>
+    <CORRECT>NotEmpty(ZERO)</CORRECT>
+    <CORRECT>Check(ZERO) and Different("")</CORRECT>
+    <CORRECT>Check(FALSE)</CORRECT>
+    <CORRECT>NotEmpty(FALSE)</CORRECT>
+    <CORRECT>Check(FALSE) and Different("")</CORRECT>
+    <CORRECT>Valid(ONE)</CORRECT>
+    <CORRECT>Valid(TWO)</CORRECT>
+    <CORRECT>Valid(TWO)</CORRECT>
+    <CORRECT>NOT Valid(FALSE)</CORRECT>
+    <CORRECT>Greater(ONE, TWO)</CORRECT>
+    <CORRECT>Greater(TWO, 1)</CORRECT>
+    <CORRECT>Lower(ONE, TWO)</CORRECT>
+    <CORRECT>GreaterOrEqual(ONE, TWO)</CORRECT>
+    <CORRECT>Equal(ONE, TWO)</CORRECT>
+    <CORRECT>StringEqual(2, TWO)</CORRECT>
+    </Root>

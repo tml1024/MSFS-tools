@@ -215,27 +215,42 @@ def evalcondition(type, elem, params):
     match = elem.get('Match')
     different = elem.get('Different')
     if ((valid or notempty) and (check or match or different)) or (match and different):
-        fatal('Invalid combination of attributes for Condition element')
+        fatal('Invalid combination of attributes for ' + type + ' element')
     if valid != None:
         value = params.get(valid)
-        return value != None and value != '0' and value != 'False' and value != 'FALSE' and value != ''
+        if value != None and value != '0' and value != 'False' and value != 'FALSE' and value != '':
+            return 'True'
+        else:
+            return 'False'
     elif notempty != None:
         value = params.get(notempty)
-        return value != None and value != ''
+        if value != None and value != '':
+            return 'True'
+        else:
+            return 'False'
     else:
         value = expandparamname(params.get(check), params)
         if match != None:
-            return value == match
+            if value == match:
+                return 'True'
+            else:
+                return 'False'
         elif different != None:
-            return value != different
+            if value != different:
+                return 'True'
+            else:
+                return 'False'
         else:
-            return value != None
+            if value != None:
+                return 'True'
+            else:
+                return 'False'
 
 def evalexpr(elem, indent, params):
     verbose(indent, 'Evaluating expression:')
     if args.verbose:
         writeelement(elem)
-    verbose(indent, 'With params: ' + str(params))
+    verbose(0, '  with params: ' + str(params))
     if len(list(elem)) == 0:
         return elem.text
     elif len(list(elem)) == 1:
@@ -321,20 +336,17 @@ def evalexpr(elem, indent, params):
             else:
                 return 'False'
         elif op.tag == 'Arg':
-            if evalcondition('Arg', op, params):
-                return 'True'
-            else:
-                return 'False'
+            return  evalcondition('Arg', op, params)
         else:
             fatal('Unknown operator element "' + op.tag+ '"')
 
 def expandcondition(siblings, ix, indent, params):
     elem = siblings[ix]
-    verbose(indent, 'Expanding "Condition" element ' + elemtostring(elem))
     trues = elem.findall('True')
     falses = elem.findall('False')
     if len(trues) > 1 or len(falses) > 1:
         fatal('"Condition" element has too many True or False children')
+    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(params))
     if len(elem.keys()) == 0:
         if len(list(elem)) == 0:
             fatal('Invalid "Condition" element with no attributes no children')
@@ -348,7 +360,7 @@ def expandcondition(siblings, ix, indent, params):
         success = evalcondition('Condition', siblings[ix], params)
     verbose(indent, '  Condition evaluates as ' + str(success))
     siblings.pop(ix)
-    if success:
+    if success == 'True':
         if len(trues) == 1:
             for i in list(trues[0]):
                 verbose(indent, '  Inserting subelement of "True" child: ' + elemtostring(i))
@@ -356,6 +368,8 @@ def expandcondition(siblings, ix, indent, params):
                 ix += 1
         else:
             for i in list(elem):
+                if i.tag == 'Test':
+                    continue
                 verbose(indent, '  Inserting child: ' + elemtostring(i))
                 siblings.insert(ix, i)
                 ix += 1
@@ -374,13 +388,7 @@ def expandswitch(siblings, ix, indent, params):
         fatal('"Switch" element has more than one "Default" child')
     if len(cases) == 0 and len(defaults) == 0:
         fatal('"Switch" element has neither "Case" or "Default" children')    
-    if args.verbose:
-        if len(defaults) == 0:
-            numdefaults = 'no "Default" children'
-        else:
-            numdefaults = 'one "Default" child'
-        verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + numdefaults + ' with ' + str(params))
-        writeelement(elem)
+    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(params))
     param = elem.get('Param')
     if param:
         param = expandparamname(param, params)
@@ -405,6 +413,7 @@ def expandswitch(siblings, ix, indent, params):
 def expandloop(siblings, ix, indent, params):
     elem = siblings[ix]
     params = params.copy()
+    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(params))
     l = elem.findall('Setup')
     if len(l) == 0:
         fatal('"Loop" element with no "Setup" child')
@@ -564,9 +573,9 @@ def expandusetemplate(siblings, ix, indent, file, params):
         ix += 1
 
 def expand(elem, indent, file, params):
-    verbose(indent, 'Expanding ' + elemtostring(elem))
     didany = True
     kids = list(elem)
+    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(len(kids)) + ' children')
     ix = 0
     filestack = [ file ]
 
@@ -647,7 +656,7 @@ def expand(elem, indent, file, params):
             expand(kid, indent, filestack[-1], params.copy())
             kids[ix].text = expandstring(kid.text, params)
             kids[ix].tail = expandstring(kid.tail, params)
-        ix += 1
+            ix += 1
     # Now drop all original children of elem and insert the expanded children instead
     removechildren(elem)
     for kid in kids:

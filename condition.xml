@@ -1,0 +1,376 @@
+<Root>
+  Hello.
+  <Template Name="Main">
+    <!-- Conditions without any attribute, and thus a Test child,
+         with no True or False children. Very simple Test trees.
+    -->
+    <Condition>
+      <Test>
+	<Arg Valid="NONEXISTENT"/>
+      </Test>
+      <WRONG>Valid(NONEXISTENT)</WRONG>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="NONEXISTENT"/>
+      </Test>
+      <WRONG>Check(NONEXISTENT)</WRONG>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg NotEmpty="NONEXISTENT"/>
+      </Test>
+      <WRONG>NotEmpty(NONEXISTENT)</WRONG>
+    </Condition>
+    <!-- No idea whether using a nonexistent parameter in the Check
+         attribute is supposed to match an empty string or what, so
+         bypassing these checks for now. Intuitively, a nonexitent
+         paramter should not match anything, not even an empty
+         string, and also be different from everything, also an
+         empty string. But witout a formal definition of the
+         language, who knows.
+    -->
+    <!--
+	<Condition>
+	<Test>
+	<Arg Check="NONEXISTENT" Match="Something"/>
+	</Test>
+	<WRONG>Check(NONEXISTENT) and Match(Something)</WRONG>
+	</Condition>
+	<Condition>
+	<Test>
+	<Arg Check="NONEXISTENT" Different="Something"/>
+	</Test>
+	<WRONG>Check(NONEXISTENT) and Different(Something)</WRONG>
+	</Condition>
+    -->
+
+    <Condition>
+      <Test>
+	<Arg Valid="PLUGH"/>
+      </Test>
+      <True>
+	<CORRECT>Valid(PLUGH)</CORRECT>
+      </True>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Arg Valid="EMPTY"/>
+      </Test>
+      <True>
+	<WRONG>Valid(EMPTY)</WRONG>
+      </True>
+      <False>
+	<CORRECT>Not Valid(EMPTY)</CORRECT>
+      </False>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="EMPTY"/>
+      </Test>
+      <CORRECT>Check(EMPTY)</CORRECT>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg NotEmpty="EMPTY"/>
+      </Test>
+      <False>
+	<CORRECT>Not NotEmpty(EMPTY)</CORRECT>
+      </False>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="EMPTY" Match=""/>
+      </Test>
+      <CORRECT>Check(EMPTY) and Match("")</CORRECT>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="EMPTY" Different=""/>
+      </Test>
+      <WRONG>Check(EMPTY) and Different=("")</WRONG>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="EMPTY" Match="Something"/>
+      </Test>
+      <WRONG>Check(EMPTY) and Match("Something")</WRONG>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="EMPTY" Different="Something"/>
+      </Test>
+      <CORRECT>Check(EMPTY) and Different=("Something)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Arg Valid="ZERO"/>
+      </Test>
+      <WRONG>Valid(ZERO)</WRONG>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="ZERO"/>
+      </Test>
+      <CORRECT>Check(ZERO)</CORRECT>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg NotEmpty="ZERO"/>
+      </Test>
+      <CORRECT>NotEmpty(ZERO)</CORRECT>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="ZERO" Match=""/>
+      </Test>
+      <WRONG>Check(ZERO) and Match("")</WRONG>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="ZERO" Different=""/>
+      </Test>
+      <CORRECT>Check(ZERO) and Different("")</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Arg Valid="FALSE"/>
+      </Test>
+      <WRONG>Valid(FALSE)</WRONG>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="FALSE"/>
+      </Test>
+      <CORRECT>Check(FALSE)</CORRECT>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg NotEmpty="FALSE"/>
+      </Test>
+      <CORRECT>NotEmpty(FALSE)</CORRECT>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="FALSE" Match=""/>
+      </Test>
+      <WRONG>Check(FALSE) and Match("")</WRONG>
+    </Condition>
+    <Condition>
+      <Test>
+	<Arg Check="FALSE" Different=""/>
+      </Test>
+      <CORRECT>Check(FALSE) and Different("")</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Arg Valid="ONE"/>
+      </Test>
+      <CORRECT>Valid(ONE)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Arg Valid="TRUE"/>
+      </Test>
+      <CORRECT>Valid(TWO)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Arg Valid="TWO"/>
+      </Test>
+      <CORRECT>Valid(TWO)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Not>
+	  <Arg Valid="FALSE"/>
+	</Not>
+      </Test>
+      <CORRECT>NOT Valid(FALSE)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Greater>
+	  <Value>ONE</Value>
+	  <Value>TWO</Value>
+	</Greater>
+      </Test>
+      <WRONG>Greater(ONE, TWO)</WRONG>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Greater>
+	  <Value>TWO</Value>
+	  <Value>ONE</Value>
+	</Greater>
+      </Test>
+      <CORRECT>Greater(ONE, TWO)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Greater>
+	  <Number>1</Number>
+	  <Value>TWO</Value>
+	</Greater>
+      </Test>
+      <WRONG>Greater(1, TWO)</WRONG>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Greater>
+	  <Value>TWO</Value>
+	  <Number>1</Number>
+	</Greater>
+      </Test>
+      <CORRECT>Greater(TWO, 1)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Greater>
+	  <Value>ONE</Value>
+	  <Number>2</Number>
+	</Greater>
+      </Test>
+      <WRONG>Greater(ONE, 2)</WRONG>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Lower>
+	  <Value>ONE</Value>
+	  <Value>TWO</Value>
+	</Lower>
+      </Test>
+      <CORRECT>Lower(ONE, TWO)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Lower>
+	  <Value>TWO</Value>
+	  <Value>ONE</Value>
+	</Lower>
+      </Test>
+      <WRONG>Lower(ONE, TWO)</WRONG>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<GreaterOrEqual>
+	  <Value>ONE</Value>
+	  <Value>TWO</Value>
+	</GreaterOrEqual>
+      </Test>
+      <WRONG>GreaterOrEqual(ONE, TWO)</WRONG>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<GreaterOrEqual>
+	  <Value>TWO</Value>
+	  <Value>ONE</Value>
+	</GreaterOrEqual>
+      </Test>
+      <CORRECT>GreaterOrEqual(ONE, TWO)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Equal>
+	  <Value>ONE</Value>
+	  <Value>TWO</Value>
+	</Equal>
+      </Test>
+      <WRONG>Equal(ONE, TWO)</WRONG>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Equal>
+	  <Value>ONE</Value>
+	  <Value>ONE</Value>
+	</Equal>
+      </Test>
+      <CORRECT>Equal(ONE, TWO)</CORRECT>
+    </Condition>
+
+    <!-- It is undocumented how non-numeric parameters are supposed
+         to compare with the arithmetic comparison operators.
+    -->
+
+    <Condition>
+      <Test>
+	<StringEqual>
+	  <Text>Xyzzy</Text>
+	  <Value>ONE</Value>
+	</StringEqual>
+      </Test>
+      <WRONG>StringEqual(Xyzzy, TWO)</WRONG>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<StringEqual>
+	  <Text>2</Text>
+	  <Value>TWO</Value>
+	</StringEqual>
+      </Test>
+      <CORRECT>StringEqual(2, TWO)</CORRECT>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<Or>
+	  <Arg Valid="NONEXISTENT"/>
+	  <Arg Valid="EMPTY"/>
+	</Or>
+      </Test>
+      <WRONG>Valid(NONEXISTENT) OR Valid(EMPTY)</WRONG>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<And>
+	  <Arg Valid="PLUGH"/>
+	  <Arg Valid="EMPTY"/>
+	</And>
+      </Test>
+      <WRONG>Valid(PLUGH) AND Valid(EMPTY)</WRONG>
+    </Condition>
+
+    <Condition>
+      <Test>
+	<And>
+	  <Arg Valid="PLUGH"/>
+	  <Arg Valid="EMPTY"/>
+	</And>
+      </Test>
+      <WRONG>PLUGH AND EMPTY</WRONG>
+    </Condition>
+
+    <!-- I am bored now, will write more if I notice something that isn't working. -->
+
+  </Template>
+  <UseTemplate Name="Main">
+    <PLUGH>Plugh</PLUGH>
+    <EMPTY></EMPTY>
+    <ZERO>0</ZERO>
+    <FALSE>False</FALSE>
+    <ONE>1</ONE>
+    <TRUE>True</TRUE>
+    <TWO>2</TWO>
+  </UseTemplate>
+  Bye.
+</Root>
