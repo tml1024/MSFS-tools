@@ -110,21 +110,6 @@ def deepcopytree(root):
         root.append(deepcopytree(kid))
     return root
 
-def elide(elem, tag):
-    result = [ ]
-    if elem.tag == tag:
-        for i in list(elem):
-            result.extend(elide(i, tag))
-    else:
-        kids = []
-        for i in list(elem):
-            kids.extend(elide(i, tag))
-        removechildren(elem)
-        for i in kids:
-            elem.append(i)
-        result = [elem]
-    return result
-
 def expandparamname(name, params):
     value = params.get(name)
     if value != None:
@@ -141,23 +126,6 @@ def expandstring(string, params):
     # Remove unexpanded leftover parameter referenced
     string = re.sub('__HASH__' + IDENTIFIER + '__HSAH__', '', string)
     return string
-
-def expandparametersinelem(elem, params):
-    return elem
-    elem.tag = expandstring(elem.tag, params)
-    elem.text = expandstring(elem.text, params)
-    elem.tail = expandstring(elem.tail, params)
-    newattribs = {}
-    for key, value in elem.items():
-        newvalue = expandstring(value, params)
-        newkey = expandstring(key, params)
-        newattribs[newkey] = newvalue
-    removeattribs(elem)
-    for key, value in newattribs.items():
-        elem.set(key, value)
-    for i in list(elem):
-        expandparametersinelem(i, params.copy())
-    return elem
 
 def evalrpn(rpn, kind, indent, params):
     tokens = re.findall(NUMBER + '|' + IDENTIFIER + '|' + r'-?\d+(?:\.\d+)?|[_A-Za-z][_A-Za-z0-9]+|\+|-|\*|/', rpn)
