@@ -99,6 +99,9 @@ def parse(filename):
     with open(filename, 'r') as f:
         data = f.read()
         data = re.sub('#(' + IDENTIFIER + ')#', r'__HASH__\1__HSAH__', data)
+        # The RPN in some files uses & and > as such. Try to fix those,
+        data = re.sub(' > if{', ' &gt; if{', data)
+        data = re.sub(' & ', ' &amp; ', data)
         return ET.fromstring(data)
     return None
 
