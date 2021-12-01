@@ -459,7 +459,9 @@ def expandusetemplate(siblings, ix, indent, file, params):
     verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(params))
     template = templates.get(name)
     if not template:
-        fatal('Expanding undefined template "' + name + '"')
+        verbose(indent, 'Undefined template "' + name + '"')
+        siblings.pop(ix)
+        return
         
     # Handle the arguments provided at the call site
     expand(elem, indent, file, params)
