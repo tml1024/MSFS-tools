@@ -150,7 +150,7 @@ def expandstring(string, params):
     return string
 
 def evalrpn(rpn, kind, indent, params):
-    verbose(indent, 'Evaluating ' + kind + ' RPN: "' + rpn + '"')
+    verbose(indent, 'Evaluating RPN to ' + kind + ': "' + rpn + '"')
     tokens = re.findall(NUMBER + '|' + IDENTIFIER + '|' + r'-?\d+(?:\.\d+)?|[_A-Za-z][_A-Za-z0-9]+|\+|-|\*|/|\s+|.', rpn)
     stack = []
     # Let's not call fatal() in this function. Let's assume if there
@@ -256,7 +256,7 @@ def evalcondition(type, elem, params):
                 return 'False'
 
 def evalexpr(elem, indent, params):
-    verbose(indent, 'Evaluating expression: ' + treetostring(1, True, elem))
+    verbose(indent, 'Evaluating XML expression: ' + treetostring(1, True, elem))
     if len(list(elem)) == 0:
         if elem.tag == 'Arg':
             return evalcondition('Arg', elem, params)
