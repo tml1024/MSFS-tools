@@ -275,26 +275,28 @@ def evalexpr(elem, indent, params):
                 return 'False'
         else:
             fatal('Unknown unary operator "' + elem.tag + '"')
-    elif len(list(elem)) == 2:
-        if elem.tag == 'And':
-            a = expandparamname(evalexpr(list(elem)[0], indent + 1, params), params)
+    elif elem.tag == 'And':
+        if len(elem) == 0:
+            fatal('No children for And operator')
+        kidix = 0
+        while kidix < len(list(elem)):
+            a = expandparamname(evalexpr(list(elem)[kidix], indent + 1, params), params)
             if a != 'True':
                 return 'False'
-            return expandparamname(evalexpr(list(elem)[1], indent + 1, params), params)
-            if a == 'True' and b == 'True':
-                return 'True'
-            else:
-                return 'False'
-        elif elem.tag == 'Or':
+            kidix += 1
+        return 'True'
+    elif elem.tag == 'Or':
+        if len(elem) == 0:
+            fatal('No children for Or operator')
+        kidix = 0
+        while kidix < len(list(elem)):
             a = expandparamname(evalexpr(list(elem)[0], indent + 1, params), params)
             if a == 'True':
                 return 'True'
-            b = expandparamname(evalexpr(list(elem)[1], indent + 1, params), params)
-            if b == 'True':
-                return 'True'
-            else:
-                return 'False'
-        elif elem.tag == 'Greater':
+            kidix += 1
+        return 'False'
+    elif len(list(elem)) == 2:
+        if elem.tag == 'Greater':
             a = evalexpr(list(elem)[0], indent + 1, params)
             b = evalexpr(list(elem)[1], indent + 1, params)
             if float(a) > float(b):
