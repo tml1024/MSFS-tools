@@ -34,7 +34,7 @@ if os.path.dirname(args.input) == '':
     args.input = './' + args.input
 
 NUMBER = r'-?\d+(?:\.\d+)?'
-IDENTIFIER = r'[_A-Za-z][_A-Za-z0-9]+'
+IDENTIFIER = r'[_A-Za-z][_A-Za-z0-9]*'
 
 templates = { }
 inputevents = { }
@@ -66,15 +66,34 @@ def cleanpathname(path):
     result = result.replace('//', '/')
     return result
 
-def writeelement(elem):
-    ET.ElementTree(elem).write(sys.stderr, encoding='Unicode')
-
-def elemtostring(elem):
+def treetostring(depth, compress, elem):
     result = '<' + elem.tag;
     for i in elem.keys():
         result += ' ' + i + '="' + elem.get(i) + '"'
+    if elem.text == None and len(list(elem)) == 0:
+        result += '/>'
+        return result
     result += '>'
+    if elem.text != None:
+        if compress:
+            result += re.sub(r'\s+', ' ', elem.text)
+        else:
+            result += elem.text
+    if depth == 0 and len(list(elem)) > 0:
+        result += '...'
+    else:
+        for i in list(elem):
+            result += treetostring(depth - 1, compress, i)
+            lasttail = list(elem)[-1].tail
+            if compress:
+                result += re.sub(r'\s+', ' ', lasttail)
+            else:
+                result += lasttail
+    result += '</' + elem.tag + '>'
     return result
+
+def elemtostring(elem):
+    return treetostring(0, True, elem)
 
 def parse(filename):
     with open(filename, 'r') as f:
@@ -129,10 +148,13 @@ def expandstring(string, params):
 
 def evalrpn(rpn, kind, indent, params):
     verbose(indent, 'Evaluating ' + kind + ' RPN: "' + rpn + '"')
-    tokens = re.findall(NUMBER + '|' + IDENTIFIER + '|' + r'-?\d+(?:\.\d+)?|[_A-Za-z][_A-Za-z0-9]+|\+|-|\*|/', rpn)
+    tokens = re.findall(NUMBER + '|' + IDENTIFIER + '|' + r'-?\d+(?:\.\d+)?|[_A-Za-z][_A-Za-z0-9]+|\+|-|\*|/|\s+|.', rpn)
     stack = []
     for token in tokens:
-        if re.fullmatch(NUMBER, token):
+        if re.fullmatch(r'\s+', token):
+            # Whitespace
+            pass
+        elif re.fullmatch(NUMBER, token):
             stack.append(float(token))
         elif re.fullmatch(IDENTIFIER, token):
             match = re.fullmatch('__HASH__(' + IDENTIFIER + ')__HSAH__', token) 
@@ -165,6 +187,9 @@ def evalrpn(rpn, kind, indent, params):
             b = float(stack.pop())
             a = float(stack.pop())
             stack.append(str(a / b))
+        else:
+            # Unrecognized token, let's assume it is a run-time expression
+            return rpn
     if len(stack) > 1:
         fatal('Extra items on stack after evaluation of RPN ' + rpn)
     if kind == 'Int':
@@ -189,7 +214,6 @@ def evalparam(param, kind, indent, params):
 def evalcondition(type, elem, params):
     valid = elem.get('Valid')
     check = elem.get('Check')
-    verbose(0, '**** check=' + str(check))
     notempty = elem.get('NotEmpty')
     match = elem.get('Match')
     different = elem.get('Different')
@@ -220,105 +244,102 @@ def evalcondition(type, elem, params):
             else:
                 return 'False'
         else:
-            verbose(0, '**** value=' + str(value))
             if value != None:
                 return 'True'
             else:
                 return 'False'
 
 def evalexpr(elem, indent, params):
-    verbose(indent, 'Evaluating expression:')
-    if args.verbose:
-        writeelement(elem)
-    verbose(0, ' with params: ' + str(params))
+    verbose(indent, 'Evaluating expression: ' + treetostring(1, True, elem))
     if len(list(elem)) == 0:
-        return elem.text
+        if elem.tag == 'Arg':
+            return evalcondition('Arg', elem, params)
+        elif elem.tag == 'Value':
+            result = expandparamname(elem.text, params)
+            # Sigh, it is OK to use Value for a nonexistent parameter,
+            # and that apparently means zero.
+            if result == None:
+                return '0'
+            else:
+                return result
+        elif elem.tag == 'Number':
+            return elem.text
+        else:
+            fatal('Unknown terminal expression element "' + elem.tag + '"')
     elif len(list(elem)) == 1:
-        op = list(elem)[0]
-        if op.tag == 'And':
-            if len(list(op)) != 2:
-                fatal('Operator element "And" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
-            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
-            if a == 'True' and b == 'True':
-                return 'True'
-            else:
-                return 'False'
-        elif op.tag == 'Or':
-            if len(list(op)) != 2:
-                fatal('Operator element "Or" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
-            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
-            if a == 'True' or b == 'True':
-                return 'True'
-            else:
-                return 'False'
-        elif op.tag == 'Not':
-            if len(list(op)) != 1:
-                fatal('Operator element "Not" should have only one child element')
-            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
+        if elem.tag == 'Not':
+            a = expandparamname(evalexpr(list(elem)[0], indent + 1, params), params)
             if a != 'True':
                 return 'True'
             else:
                 return 'False'
-        elif op.tag == 'Greater':
-            if len(list(op)) != 2:
-                fatal('Operator element "Greater" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
-            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
-            if int(a) > int(b):
+        else:
+            fatal('Unknown unary operator "' + elem.tag + '"')
+    elif len(list(elem)) == 2:
+        if elem.tag == 'And':
+            a = expandparamname(evalexpr(list(elem)[0], indent + 1, params), params)
+            if a != 'True':
+                return 'False'
+            return expandparamname(evalexpr(list(elem)[1], indent + 1, params), params)
+            if a == 'True' and b == 'True':
                 return 'True'
             else:
                 return 'False'
-        elif op.tag == 'Lower':
-            if len(list(op)) != 2:
-                fatal('Operator element "Lower" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
-            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
-            if int(a) < int(b):
+        elif elem.tag == 'Or':
+            a = expandparamname(evalexpr(list(elem)[0], indent + 1, params), params)
+            if a == 'True':
+                return 'True'
+            b = expandparamname(evalexpr(list(elem)[1], indent + 1, params), params)
+            if b == 'True':
                 return 'True'
             else:
                 return 'False'
-        elif op.tag == 'GreaterOrEqual':
-            if len(list(op)) != 2:
-                fatal('Operator element "GreaterOrEqual" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
-            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
-            if int(a) >= int(b):
+        elif elem.tag == 'Greater':
+            a = evalexpr(list(elem)[0], indent + 1, params)
+            b = evalexpr(list(elem)[1], indent + 1, params)
+            if float(a) > float(b):
                 return 'True'
             else:
                 return 'False'
-        elif op.tag == 'LowerOrEqual':
-            if len(list(op)) != 2:
-                fatal('Operator element "LowerOrEqual" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
-            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
-            if int(a) <= int(b):
+        elif elem.tag == 'Lower':
+            a = evalexpr(list(elem)[0], indent + 1, params)
+            b = evalexpr(list(elem)[1], indent + 1, params)
+            if float(a) < float(b):
                 return 'True'
             else:
                 return 'False'
-        elif op.tag == 'Equal':
-            if len(list(op)) != 2:
-                fatal('Operator element "LowerOrEqual" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
-            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
-            if int(a) == int(b):
+        elif elem.tag == 'GreaterOrEqual':
+            a = evalexpr(list(elem)[0], indent + 1, params)
+            b = evalexpr(list(elem)[1], indent + 1, params)
+            if float(a) >= float(b):
                 return 'True'
             else:
                 return 'False'
-        elif op.tag == 'StringEqual':
-            if len(list(op)) != 2:
-                fatal('Operator element "LowerOrEqual" should have two child elements')
-            a = expandparamname(evalexpr(list(op)[0], indent, params), params)
-            b = expandparamname(evalexpr(list(op)[1], indent, params), params)
+        elif elem.tag == 'LowerOrEqual':
+            a = evalexpr(list(elem)[0], indent + 1, params)
+            b = evalexpr(list(elem)[1], indent + 1, params)
+            if float(a) <= float(b):
+                return 'True'
+            else:
+                return 'False'
+        elif elem.tag == 'Equal':
+            a = evalexpr(list(elem)[0], indent + 1, params)
+            b = evalexpr(list(elem)[1], indent + 1, params)
+            if float(a) == float(b):
+                return 'True'
+            else:
+                return 'False'
+        elif elem.tag == 'StringEqual':
+            a = evalexpr(list(elem)[0], indent + 1, params)
+            b = evalexpr(list(elem)[1], indent + 1, params)
             if a == b:
                 return 'True'
             else:
                 return 'False'
-        elif op.tag == 'Arg':
-            return  evalcondition('Arg', op, params)
         else:
-            fatal('Unknown operator element "' + op.tag+ '"')
+            fatal('Unknown binary operator "' + op.tag+ '"')
+    else:
+        fatal('Weird expression ' + treetostring(1, True, elem))
 
 def expandcondition(siblings, ix, indent, params):
     elem = siblings[ix]
@@ -335,7 +356,12 @@ def expandcondition(siblings, ix, indent, params):
         test = list(elem)[0]
         if test.tag != 'Test':
             fatal('Invalid "Condition" element with no attributes but without a Test element as first child')
-        success = evalexpr(test, indent, params)
+        # The Test element apparently can have multiple children. In
+        # that case an And operator is implied, it seems.
+        success = True
+        for i in list(test):
+            if success:
+                success = success and evalexpr(i, indent, params)
     else:
         success = evalcondition('Condition', siblings[ix], params)
     verbose(indent, ' Condition evaluates as ' + str(success))
@@ -427,7 +453,7 @@ def expandswitch(siblings, ix, indent, params):
 def expandloop(siblings, ix, indent, params):
     elem = siblings[ix]
     params = params.copy()
-    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(params))
+    verbose(indent, 'Expanding ' + treetostring(2, True, elem) + ' with ' + str(params))
     l = elem.findall('Setup')
     if len(l) == 0:
         fatal('"Loop" element with no "Setup" child')
@@ -445,21 +471,26 @@ def expandloop(siblings, ix, indent, params):
         fatal('"Loop" element with more than one "Then" child')
     then = None
     if len(l) == 1:
-        then = len[0]
-    if len(setup.findall('Param')) != 1 or len(setup.findall('From')) != 1 or len(setup.findall('Inc')) != 1 \
+        then = l[0]
+    if len(setup.findall('Param')) != 1 or len(setup.findall('From')) != 1 or len(setup.findall('Inc')) > 1 \
        or len(setup.findall('To')) > 1 or len(setup.findall('While')) > 1 \
        or (len(setup.findall('To')) == 1 and len(setup.findall('While')) == 1):
         fatal('"Loop" element syntax error')
 
     var = setup.find('Param').text
-    initialval = setup.find('From').text
-    inc = int(setup.find('Inc').text)
+    loopvar = float(expandstring(setup.find('From').text, params))
+    inc = setup.find('Inc')
+    if inc != None:
+        inc = float(expandstring(inc.text, params))
+    else:
+        inc = 1
     to = setup.find('To')
     if to != None:
-        to = int(to.text)
+        to = float(expandstring(to.text, params))
     hwile = setup.find('While')
+    if hwile != None and len(hwile) != 1:
+        fatal('Invalid While tree ' + treetostring(1, True, hwile))
 
-    loopvar = int(initialval)
     params[var] = str(loopvar)
     numiters = 0
 
@@ -479,7 +510,7 @@ def expandloop(siblings, ix, indent, params):
         if to != None and ((inc > 0 and loopvar >= to) or (inc < 0 and loopvar <= to)):
             break
         if hwile != None:
-            if evalexpr(hwile, indent, params) == 'False':
+            if evalexpr(list(hwile)[0], indent, params) == 'False':
                 break
     # Set the tail of the original Loop element to the last of the inserted elements
     siblings[ix-1].tail = elem.tail

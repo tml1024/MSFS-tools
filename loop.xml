@@ -26,6 +26,22 @@
       <Bar>#BAR#</Bar>
     </Do>
   </Loop>
+  <Loop>
+    <Setup>
+      <Param>I</Param>
+      <From>1</From>
+      <Inc>1</Inc>
+      <While>
+	<Lower>
+	  <Value>I</Value>
+	  <Number>5</Number>
+	</Lower>
+      </While>
+    </Setup>
+    <Do>
+      <I>#I#</I>
+    </Do>
+  </Loop>
   #FOO# <!-- Should not have any value -->
   #BAR#
   Bye.
