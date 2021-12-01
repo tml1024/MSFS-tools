@@ -627,6 +627,8 @@ def expand2(intemplate, elem, indent, file, params):
             kids.pop(ix)
         elif kid.tag == 'Include':
             filename = kid.get('ModelBehaviorFile')
+            if filename == None:
+                filename = kid.get('Path')
             if filename:
                 filename = cleanpathname(filename)
                 fullname = includedir + '/' + filename
@@ -636,7 +638,7 @@ def expand2(intemplate, elem, indent, file, params):
                     filename = cleanpathname(filename)
                     fullname = os.path.dirname(filestack[-1]) + '/' + filename
                 else:
-                    fatal('"Include" element without "ModelBehaviorFile" or "RelativeFile" attribute');
+                    fatal('"Include" element without "ModelBehaviorFile", "Path", or "RelativeFile" attribute');
 
             kids.pop(ix)
 
