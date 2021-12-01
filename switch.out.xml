@@ -1,0 +1,75 @@
+<Root>
+  <TEXT>
+    No parameter passed at all
+  </TEXT>
+
+  <TEXT>T1 BEGIN</TEXT>
+    <TEXT>Default</TEXT>
+      <TEXT>END T1</TEXT>
+  <TEXT>T2 BEGIN</TEXT>
+    <TEXT>Check(P1) and Different('FOO')</TEXT>
+      <TEXT>END T2</TEXT>
+  <TEXT>T3 BEGIN</TEXT>
+    <TEXT>END T3</TEXT>
+  <TEXT>
+    Parameter P1='' passed
+  </TEXT>
+
+  <TEXT>T1 BEGIN</TEXT>
+    <TEXT>Check(P1)</TEXT>
+      <TEXT>END T1</TEXT>
+  <TEXT>T2 BEGIN</TEXT>
+    <TEXT>Check(P1) and Different('FOO')</TEXT>
+      <TEXT>END T2</TEXT>
+  <TEXT>T3 BEGIN</TEXT>
+    <TEXT>END T3</TEXT>
+  <TEXT>
+    Parameter P1='0' passed
+  </TEXT>
+
+  <TEXT>T1 BEGIN</TEXT>
+    <TEXT>Check(P1)</TEXT>
+      <TEXT>END T1</TEXT>
+  <TEXT>T2 BEGIN</TEXT>
+    <TEXT>Check(P1) and Different('FOO')</TEXT>
+      <TEXT>END T2</TEXT>
+  <TEXT>T3 BEGIN</TEXT>
+    <TEXT>END T3</TEXT>
+  <TEXT>
+    Parameter P1='False' passed
+  </TEXT>
+
+  <TEXT>T1 BEGIN</TEXT>
+    <TEXT>Check(P1)</TEXT>
+      <TEXT>END T1</TEXT>
+  <TEXT>T2 BEGIN</TEXT>
+    <TEXT>Check(P1) and Different('FOO')</TEXT>
+      <TEXT>END T2</TEXT>
+  <TEXT>T3 BEGIN</TEXT>
+    <TEXT>END T3</TEXT>
+  <TEXT>
+    Parameter P1='FOO' passed
+  </TEXT>
+
+  <TEXT>T1 BEGIN</TEXT>
+    <TEXT>Valid(P1)</TEXT>
+      <TEXT>END T1</TEXT>
+  <TEXT>T2 BEGIN</TEXT>
+    <TEXT>Check(P1) and Match('FOO')</TEXT>
+      <TEXT>END T2</TEXT>
+  <TEXT>T3 BEGIN</TEXT>
+    <TEXT>PARAM=P1 and Value('FOO')</TEXT>
+      <TEXT>END T3</TEXT>
+  <TEXT>
+    Parameter P1='BAR' passed
+  </TEXT>
+
+  <TEXT>T1 BEGIN</TEXT>
+    <TEXT>Valid(P1)</TEXT>
+      <TEXT>END T1</TEXT>
+  <TEXT>T2 BEGIN</TEXT>
+    <TEXT>Check(P1) and Different('FOO')</TEXT>
+      <TEXT>END T2</TEXT>
+  <TEXT>T3 BEGIN</TEXT>
+    <TEXT>END T3</TEXT>
+  </Root>

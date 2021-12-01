@@ -114,7 +114,7 @@ def expandparamname(name, params):
     value = params.get(name)
     if value != None:
         return value
-    return name
+    return None
 
 def expandstring(string, params):
     if string == None:
@@ -128,6 +128,7 @@ def expandstring(string, params):
     return string
 
 def evalrpn(rpn, kind, indent, params):
+    verbose(indent, 'Evaluating ' + kind + ' RPN: "' + rpn + '"')
     tokens = re.findall(NUMBER + '|' + IDENTIFIER + '|' + r'-?\d+(?:\.\d+)?|[_A-Za-z][_A-Za-z0-9]+|\+|-|\*|/', rpn)
     stack = []
     for token in tokens:
@@ -172,7 +173,7 @@ def evalrpn(rpn, kind, indent, params):
         result = str(float(stack.pop()))
     elif kind == 'String':
         result = str(stack.pop())
-    verbose(indent, 'Evaluated ' + rpn + ' as ' + result)
+    verbose(indent, 'Evaluated "' + rpn + '" as "' + result + '"')
     return result
 
 def evalparam(param, kind, indent, params):
@@ -188,6 +189,7 @@ def evalparam(param, kind, indent, params):
 def evalcondition(type, elem, params):
     valid = elem.get('Valid')
     check = elem.get('Check')
+    verbose(0, '**** check=' + str(check))
     notempty = elem.get('NotEmpty')
     match = elem.get('Match')
     different = elem.get('Different')
@@ -206,7 +208,7 @@ def evalcondition(type, elem, params):
         else:
             return 'False'
     else:
-        value = expandparamname(params.get(check), params)
+        value = expandparamname(check, params)
         if match != None:
             if value == match:
                 return 'True'
@@ -218,6 +220,7 @@ def evalcondition(type, elem, params):
             else:
                 return 'False'
         else:
+            verbose(0, '**** value=' + str(value))
             if value != None:
                 return 'True'
             else:
@@ -371,12 +374,46 @@ def expandswitch(siblings, ix, indent, params):
         param = expandparamname(param, params)
     expansion = None
     for case in cases:
-        if param != None:
-            if not case.get('Value'):
-                fatal('"Switch" element has "Param" attribute but child "Case" element lacks "Value" attribute')
-            if case.get('Valid') or case.get('Check') or case.get('NotEmpty') or case.get('Match') or case.get('Different'):
-                fatal('"Switch" element has "Param" attribute but child "Case" element has more attributes than just "Value"')
-            if param == expandparamname(case.get('Value'), params):
+        # Despite what the SDK docs say, even if the Switch element
+        # has a Param attribute, not all Case elements need to have a
+        # Value attribute. A Case element might also just have a
+        # Valid, Check, or Notempty attribute.
+
+        # Apparently parameter expansion #PARAMNAME# is not done on
+        # Value attributes.
+        value = case.get('Value')
+        if value != None and param != None:
+            if param == value:
+                expansion = list(case)
+                break
+        valid = case.get('Valid')
+        if valid != None:
+            valid = expandparamname(valid, params)
+            if valid != None and valid != '' and valid != '0' and valid != 'False':
+                expansion = list(case)
+                break
+        check = case.get('Check')
+        if check != None:
+            # The Check attribute contains a parameter name
+            check = expandparamname(check, params)
+            # The Match and Different attributes are always just string literals
+            match = case.get('Match')
+            different = case.get('Different')
+            if match != None:
+                if check == match:
+                    expansion = list(case)
+                    break
+            elif different != None:
+                if check != different:
+                    expansion = list(case)
+                    break
+            elif check != None:
+                expansion = list(case)
+                break
+        notempty = case.get('NotEmpty')
+        if notempty != None:
+            notempty = expandparamname(notempty, params)
+            if notempty != None and notempty != '':
                 expansion = list(case)
                 break
     if expansion == None and len(defaults) == 1:

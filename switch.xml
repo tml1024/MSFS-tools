@@ -1,0 +1,124 @@
+<Root>
+  <Template Name="T1">
+    <TEXT>T1 BEGIN</TEXT>
+    <Switch>
+      <Case Valid="P1">
+	<TEXT>Valid(P1)</TEXT>
+      </Case>
+      <Case Check="P1">
+	<TEXT>Check(P1)</TEXT>
+      </Case>
+      <Case NotEmpty="P1">
+	<TEXT>NotEmpty(P1)</TEXT>
+      </Case>
+      <Default>
+	<TEXT>Default</TEXT>
+      </Default>
+    </Switch>
+    <TEXT>END T1</TEXT>
+  </Template>
+
+  <Template Name="T2">
+    <TEXT>T2 BEGIN</TEXT>
+    <Switch>
+      <Case Check="P1" Match="FOO">
+	<TEXT>Check(P1) and Match('FOO')</TEXT>
+      </Case>
+      <Case Check="P1" Different="FOO">
+	<TEXT>Check(P1) and Different('FOO')</TEXT>
+      </Case>
+    </Switch>
+    <TEXT>END T2</TEXT>
+  </Template>
+
+  <Template Name="T3">
+    <TEXT>T3 BEGIN</TEXT>
+    <Switch Param="P1">
+      <Case Value="FOO">
+	<TEXT>PARAM=P1 and Value('FOO')</TEXT>
+      </Case>
+    </Switch>
+    <TEXT>END T3</TEXT>
+  </Template>
+
+  <TEXT>
+    No parameter passed at all
+  </TEXT>
+
+  <UseTemplate Name="T1">
+  </UseTemplate>
+  <UseTemplate Name="T2">
+  </UseTemplate>
+  <UseTemplate Name="T3">
+  </UseTemplate>
+
+  <TEXT>
+    Parameter P1='' passed
+  </TEXT>
+
+  <UseTemplate Name="T1">
+    <P1></P1>
+  </UseTemplate>
+  <UseTemplate Name="T2">
+    <P1></P1>
+  </UseTemplate>
+  <UseTemplate Name="T3">
+    <P1></P1>
+  </UseTemplate>
+
+  <TEXT>
+    Parameter P1='0' passed
+  </TEXT>
+
+  <UseTemplate Name="T1">
+    <P1>0</P1>
+  </UseTemplate>
+  <UseTemplate Name="T2">
+    <P1>0</P1>
+  </UseTemplate>
+  <UseTemplate Name="T3">
+    <P1>0</P1>
+  </UseTemplate>
+
+  <TEXT>
+    Parameter P1='False' passed
+  </TEXT>
+
+  <UseTemplate Name="T1">
+    <P1>False</P1>
+  </UseTemplate>
+  <UseTemplate Name="T2">
+    <P1>False</P1>
+  </UseTemplate>
+  <UseTemplate Name="T3">
+    <P1>False</P1>
+  </UseTemplate>
+
+  <TEXT>
+    Parameter P1='FOO' passed
+  </TEXT>
+
+  <UseTemplate Name="T1">
+    <P1>FOO</P1>
+  </UseTemplate>
+  <UseTemplate Name="T2">
+    <P1>FOO</P1>
+  </UseTemplate>
+  <UseTemplate Name="T3">
+    <P1>FOO</P1>
+  </UseTemplate>
+
+  <TEXT>
+    Parameter P1='BAR' passed
+  </TEXT>
+
+  <UseTemplate Name="T1">
+    <P1>BAR</P1>
+  </UseTemplate>
+  <UseTemplate Name="T2">
+    <P1>BAR</P1>
+  </UseTemplate>
+  <UseTemplate Name="T3">
+    <P1>BAR</P1>
+  </UseTemplate>
+</Root>
