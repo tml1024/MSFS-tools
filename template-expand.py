@@ -153,6 +153,9 @@ def evalrpn(rpn, kind, indent, params):
     verbose(indent, 'Evaluating ' + kind + ' RPN: "' + rpn + '"')
     tokens = re.findall(NUMBER + '|' + IDENTIFIER + '|' + r'-?\d+(?:\.\d+)?|[_A-Za-z][_A-Za-z0-9]+|\+|-|\*|/|\s+|.', rpn)
     stack = []
+    # Let's not call fatal() in this function. Let's assume if there
+    # is a problem that the expression is after all for run-time
+    # evaluation.
     for token in tokens:
         if re.fullmatch(r'\s+', token):
             # Whitespace
@@ -162,31 +165,31 @@ def evalrpn(rpn, kind, indent, params):
         elif re.fullmatch(IDENTIFIER, token):
             match = re.fullmatch('__HASH__(' + IDENTIFIER + ')__HSAH__', token) 
             if not match:
-                fatal('Invalid identifier in RPN expression: ' + token)
+                return rpn
             param = match.group(1)
             number = expandstring(token, params)
             stack.append(number)
         elif token == '+':
             if len(stack) < 2:
-                fatal('Stack underflow for + operator in RPN ' + rpn)
+                return rpn
             b = float(stack.pop())
             a = float(stack.pop())
             stack.append(str(a + b))
         elif token == '-':
             if len(stack) < 2:
-                fatal('Stack underflow for - operator in RPN ' + rpn)
+                return rpn
             b = float(stack.pop())
             a = float(stack.pop())
             stack.append(str(a - b))
         elif token == '*':
             if len(stack) < 2:
-                fatal('Stack underflow for * operator in RPN ' + rpn)
+                return rpn
             b = float(stack.pop())
             a = float(stack.pop())
             stack.append(str(a * b))
         elif token == '/':
             if len(stack) < 2:
-                fatal('Stack underflow for / operator in RPN ' + rpn)
+                return rpn
             b = float(stack.pop())
             a = float(stack.pop())
             stack.append(str(a / b))
@@ -194,7 +197,7 @@ def evalrpn(rpn, kind, indent, params):
             # Unrecognized token, let's assume it is a run-time expression
             return rpn
     if len(stack) > 1:
-        fatal('Extra items on stack after evaluation of RPN ' + rpn)
+        return rpn
     if kind == 'Int':
         result = str(int(float(stack.pop())))
     elif kind == 'Float':
