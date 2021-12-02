@@ -540,7 +540,7 @@ def expandusetemplate(siblings, ix, indent, file, params):
         return
         
     # Handle the arguments provided at the call site
-    expand(elem, indent, file, params)
+    expand(False, elem, indent, file, params)
 
     for arg in list(elem):
         if arg.text != None:
@@ -554,14 +554,14 @@ def expandusetemplate(siblings, ix, indent, file, params):
         params[arg.tag] = value
 
     template = deepcopytree(template)
-    template = expandintemplate(template, indent, file, params)
+    template = expand(True, template, indent, file, params)
 
     verbose(indent, ' Popping element at ' + str(ix) + ': ' + elemtostring(siblings[ix]))
     siblings.pop(ix)
     for c in list(template):
         c = shallowcopyelement(c)
         verbose(indent, ' Inserting element at ' + str(ix) + ' from template expansion:' + elemtostring(c))
-        siblings.insert(ix, expand(c, indent + 1, file, params))
+        siblings.insert(ix, expand(False, c, indent + 1, file, params))
         ix += 1
 
 def expandparameters(siblings, ix, indent, file, params):
@@ -612,7 +612,7 @@ def expandparameters(siblings, ix, indent, file, params):
     verbose(indent, 'Popping element at ' + str(ix) + ': ' + elemtostring(elem))
     siblings.pop(ix)
 
-def expand2(intemplate, elem, indent, file, params):
+def expand(intemplate, elem, indent, file, params):
     didany = True
     kids = list(elem)
     verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(len(kids)) + ' children')
@@ -699,7 +699,7 @@ def expand2(intemplate, elem, indent, file, params):
                   or kid.tag == 'OverrideTemplateParameters'):
             expandparameters(kids, ix, indent + 1, file, params)
         else:
-            kids[ix] = expand2(intemplate, kid, indent + 1, filestack[-1], params)
+            kids[ix] = expand(intemplate, kid, indent + 1, filestack[-1], params)
             kids[ix].text = expandstring(kid.text, params)
             kids[ix].tail = expandstring(kid.tail, params)
             ix += 1
@@ -710,23 +710,16 @@ def expand2(intemplate, elem, indent, file, params):
         elem.append(kid)
     return elem
         
-def expand(elem, indent, file, params):
-    return expand2(False, elem, indent, file, params)
-
 def expandtomany(elem, indent, file, params):
     dummy = ET.Element('DUMMY')
     dummy.append(elem)
-    return expand2(False, dummy, indent, file, params)
-
-def expandintemplate(elem, indent, file, params):
-    return expand2(True, elem, indent, file, params)
-
+    return expand(False, dummy, indent, file, params)
 
 # Load the input file
 tree = parse(args.input)
 
 # Do the actual work, 
-expand(tree, 0, args.input, { })
+expand(False, tree, 0, args.input, { })
 
 ET.ElementTree(tree).write(sys.stdout, encoding='Unicode')
 sys.stdout.write('\n')
