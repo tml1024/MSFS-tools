@@ -1,31 +1,38 @@
 <Root>
-  <!-- Loop with an increment larger than one to verify that the loop
-       ends even if the limit is not reached exactly.
-  -->
   Hello.
-  <Loop>
-    <Setup>
-      <Param>FOO</Param>
-      <From>12</From>
-      <Inc>2</Inc>
-      <To>15</To>
-    </Setup>
-    <Do>
-      <Foo>#FOO#</Foo>
-    </Do>
-  </Loop>
-  <!-- Loop downwards -->
-  <Loop>
-    <Setup>
-      <Param>BAR</Param>
-      <From>4</From>
-      <Inc>-3</Inc>
-      <To>-4</To>
-    </Setup>
-    <Do>
-      <Bar>#BAR#</Bar>
-    </Do>
-  </Loop>
+  <Template Name="T1">
+    <!-- Loop with an increment larger than one to verify that the loop
+	 ends even if the limit is not reached exactly.
+    -->
+    <Loop>
+      <Setup>
+	<Param>FOO</Param>
+	<From>12</From>
+	<Inc>2</Inc>
+	<To>15</To>
+      </Setup>
+      <Do>
+	<Foo>#FOO#</Foo>
+      </Do>
+    </Loop>
+  </Template>
+  <Template Name="T2">
+    <!-- Loop downwards -->
+    <Loop>
+      <Setup>
+	<Param>BAR</Param>
+	<From>4</From>
+	<Inc>-3</Inc>
+	<To>-4</To>
+      </Setup>
+      <Do>
+	<Bar>#BAR#</Bar>
+      </Do>
+    </Loop>
+  </Template>
+  <UseTemplate Name="T1"/>
+  <UseTemplate Name="T2"/>
+  <SHOULDBEEMPTY>#FOO#</SHOULDBEEMPTY>
   <Loop>
     <Setup>
       <Param>I</Param>
@@ -42,7 +49,6 @@
       <I>#I#</I>
     </Do>
   </Loop>
-  #FOO# <!-- Should not have any value -->
-  #BAR#
+  <SHOULDBEEMPTY>#I#</SHOULDBEEMPTY>
   Bye.
 </Root>

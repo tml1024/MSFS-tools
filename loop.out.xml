@@ -1,17 +1,15 @@
 <Root>
-  
   Hello.
   <Foo>12</Foo>
-    <Foo>14</Foo>
-  
+      <Foo>14</Foo>
   <Bar>4</Bar>
-    <Bar>1</Bar>
-    <Bar>-2</Bar>
+      <Bar>1</Bar>
+      <Bar>-2</Bar>
+  <SHOULDBEEMPTY />
   <I>1</I>
     <I>2</I>
     <I>3</I>
     <I>4</I>
-   
-  
+  <SHOULDBEEMPTY />
   Bye.
 </Root>

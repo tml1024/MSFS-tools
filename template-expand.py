@@ -268,7 +268,7 @@ def evalexpr(elem, indent, params):
                 return '0'
             else:
                 return result
-        elif elem.tag == 'Number':
+        elif elem.tag == 'Number' or elem.tag == 'Text':
             return elem.text
         else:
             fatal('Unknown terminal expression element "' + elem.tag + '"')
@@ -458,9 +458,10 @@ def expandswitch(siblings, ix, indent, params):
             siblings.insert(ix, i)
             ix += 1
 
-def expandloop(siblings, ix, indent, params):
+def expandloop(intemplate, siblings, ix, indent, params):
     elem = siblings[ix]
-    params = params.copy()
+    if not intemplate:
+        params = params.copy()
     verbose(indent, 'Expanding ' + treetostring(2, True, elem) + ' with ' + str(params))
     l = elem.findall('Setup')
     if len(l) == 0:
@@ -487,18 +488,26 @@ def expandloop(siblings, ix, indent, params):
 
     var = setup.find('Param').text
     loopvar = float(expandstring(setup.find('From').text, params))
+    if float(round(loopvar)) == round(loopvar):
+        loopvar = round(loopvar)
     inc = setup.find('Inc')
     if inc != None:
         inc = float(expandstring(inc.text, params))
+        if float(round(inc)) == round(inc):
+            inc = round(inc)
     else:
         inc = 1
     to = setup.find('To')
     if to != None:
         to = float(expandstring(to.text, params))
+        if float(round(inc)) == round(to):
+            to = round(to)
     hwile = setup.find('While')
     if hwile != None and len(hwile) != 1:
         fatal('Invalid While tree ' + treetostring(1, True, hwile))
 
+    if re.fullmatch(r'-?\d+\.0+', str(loopvar)):
+        params[var] = str(loopvar)
     params[var] = str(loopvar)
     numiters = 0
 
@@ -525,6 +534,7 @@ def expandloop(siblings, ix, indent, params):
 
 def expandusetemplate(siblings, ix, indent, file, params):
     elem = siblings[ix]
+    tail = elem.tail
     params = params.copy()
 
     name = elem.get('Name')
@@ -561,8 +571,13 @@ def expandusetemplate(siblings, ix, indent, file, params):
     for c in list(template):
         c = shallowcopyelement(c)
         verbose(indent, ' Inserting element at ' + str(ix) + ' from template expansion:' + elemtostring(c))
-        siblings.insert(ix, expand(False, c, indent + 1, file, params))
+        siblings.insert(ix, c)
         ix += 1
+    # Put the tail of the UseTemplate element as the tail of the last
+    # element of the expansion. If the template expanded to nothing we
+    # lose the tail. Oh well.
+    if len(list(template)) > 0:
+        siblings[ix-1].tail = tail
 
 def expandparameters(siblings, ix, indent, file, params):
     elem = siblings[ix]
@@ -587,7 +602,7 @@ def expandparameters(siblings, ix, indent, file, params):
     kids = list(elem)
     kidix = 0
     while kidix < len(kids):
-        dummy = expandtomany(kids[kidix], indent, file, params)
+        dummy = expandtomany(True, kids[kidix], indent, file, params)
         kids.pop(kidix)
         newkidix = kidix
         l = list(dummy)
@@ -615,7 +630,11 @@ def expandparameters(siblings, ix, indent, file, params):
 def expand(intemplate, elem, indent, file, params):
     didany = True
     kids = list(elem)
-    verbose(indent, 'Expanding ' + elemtostring(elem) + ' with ' + str(len(kids)) + ' children')
+    if intemplate:
+        intemplatestring = ' in a template'
+    else:
+        intemplatestring = ''
+    verbose(indent, 'Expanding ' + elemtostring(elem) + intemplatestring + ' with ' + str(len(kids)) + ' children')
     ix = 0
     filestack = [ file ]
 
@@ -689,7 +708,7 @@ def expand(intemplate, elem, indent, file, params):
         elif kid.tag == 'Switch':
             expandswitch(kids, ix, indent, params)
         elif kid.tag == 'Loop':
-            expandloop(kids, ix, indent, params)
+            expandloop(intemplate, kids, ix, indent, params)
         elif kid.tag == 'UseTemplate':
             expandusetemplate(kids, ix, indent + 1, filestack[-1], params)
         elif intemplate \
@@ -710,10 +729,10 @@ def expand(intemplate, elem, indent, file, params):
         elem.append(kid)
     return elem
         
-def expandtomany(elem, indent, file, params):
+def expandtomany(intemplate, elem, indent, file, params):
     dummy = ET.Element('DUMMY')
     dummy.append(elem)
-    return expand(False, dummy, indent, file, params)
+    return expand(intemplate, dummy, indent, file, params)
 
 # Load the input file
 tree = parse(args.input)
