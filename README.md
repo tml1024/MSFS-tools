@@ -5,8 +5,10 @@ Various tools that are useful to Microsoft Flight Simulator add-on developers. O
 ## template-expand.py
 
 This Python script reads an aircraft model XML file and expands the template calls in it. It is a work in progress. I don't know whether it
-will ever be "finished" and complete. But now it is able to expand the whole DA62_interior.xml from the SDK samples. Whether the expansion is
-correct I don't know yet. But at least it will help in understanding what the real low-level API of this stuff is, that is hidden
+will ever be "finished" and complete. But now it is able to process the whole DA62_interior.xml from the SDK samples.
+Input events (elements UseInputEvent, Extend, Presets, Preset, and others?) are not handled in any way yet, and it is very unclear
+to me how they should be handled, sorry.
+But at least this might help a bit in understanding what the real low-level API of this stuff is, that is hidden
 under layer upon layer of templates.
 
 Use: `python3 template-expand.py --verbose --include ~/Downloads/ModelBehaviorDefs a.xml`
