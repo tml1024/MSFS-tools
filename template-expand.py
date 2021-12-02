@@ -699,7 +699,7 @@ def expand2(intemplate, elem, indent, file, params):
                   or kid.tag == 'OverrideTemplateParameters'):
             expandparameters(kids, ix, indent + 1, file, params)
         else:
-            kids[ix] = expand(kid, indent + 1, filestack[-1], params.copy())
+            kids[ix] = expand2(intemplate, kid, indent + 1, filestack[-1], params)
             kids[ix].text = expandstring(kid.text, params)
             kids[ix].tail = expandstring(kid.tail, params)
             ix += 1
