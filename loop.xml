@@ -15,6 +15,23 @@
 	<Foo>#FOO#</Foo>
       </Do>
     </Loop>
+    <!-- Loop that is not executed even once -->
+    <Loop>
+      <Setup>
+	<Param>IX</Param>
+	<From>1</From>
+	<Inc>1</Inc>
+	<While>
+	  <Lower>
+	    <Value>IX</Value>
+	    <Number>1</Number>
+	  </Lower>
+	</While>
+      </Setup>
+      <Do>
+	<WRONG>#IX#</WRONG>
+      </Do>
+    </Loop>
   </Template>
   <Template Name="T2">
     <!-- Loop downwards -->

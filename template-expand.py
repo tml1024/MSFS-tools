@@ -512,6 +512,10 @@ def expandloop(intemplate, siblings, ix, indent, params):
 
     siblings.pop(ix)
     while True:
+        # The While test is checked before each iteration
+        if hwile != None:
+            if evalexpr(list(hwile)[0], indent, params) == 'False':
+                break
         for i in list(do):
             i = shallowcopyelement(i)
             i.text = expandstring(i.text, params)
@@ -519,15 +523,12 @@ def expandloop(intemplate, siblings, ix, indent, params):
             siblings.insert(ix, i)
             ix += 1
         numiters += 1
-        if to == None and hwile == None and numiters == 64:
+        if (to == None or hwile != None) and numiters == 64:
             break
         loopvar += inc
         params[var] = str(loopvar)
         if to != None and ((inc > 0 and loopvar >= to) or (inc < 0 and loopvar <= to)):
             break
-        if hwile != None:
-            if evalexpr(list(hwile)[0], indent, params) == 'False':
-                break
     # Set the tail of the original Loop element to the last of the inserted elements
     siblings[ix-1].tail = elem.tail
 
