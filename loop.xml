@@ -39,8 +39,8 @@
       <Setup>
 	<Param>BAR</Param>
 	<From>4</From>
-	<Inc>-3</Inc>
-	<To>-4</To>
+	<Inc>-1</Inc>
+	<To>-1</To>
       </Setup>
       <Do>
 	<Bar>#BAR#</Bar>

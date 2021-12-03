@@ -2,9 +2,13 @@
   Hello.
   <Foo>12</Foo>
       <Foo>14</Foo>
+      <Foo>16</Foo>
   <Bar>4</Bar>
+      <Bar>3</Bar>
+      <Bar>2</Bar>
       <Bar>1</Bar>
-      <Bar>-2</Bar>
+      <Bar>0</Bar>
+      <Bar>-1</Bar>
   <SHOULDBEEMPTY />
   <I>1</I>
     <I>2</I>
