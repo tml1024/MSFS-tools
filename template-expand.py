@@ -487,19 +487,19 @@ def expandloop(intemplate, siblings, ix, indent, params):
 
     var = setup.find('Param').text
     loopvar = float(expandstring(setup.find('From').text, params))
-    if float(round(loopvar)) == round(loopvar):
+    if float(round(loopvar)) == loopvar:
         loopvar = round(loopvar)
     inc = setup.find('Inc')
     if inc != None:
         inc = float(expandstring(inc.text, params))
-        if float(round(inc)) == round(inc):
+        if float(round(inc)) == inc:
             inc = round(inc)
     else:
         inc = 1
     to = setup.find('To')
     if to != None:
         to = float(expandstring(to.text, params))
-        if float(round(inc)) == round(to):
+        if float(round(to)) == to:
             to = round(to)
     hwile = setup.find('While')
     if hwile != None and len(hwile) != 1:
