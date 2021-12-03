@@ -457,7 +457,7 @@ def expandswitch(siblings, ix, indent, params):
             siblings.insert(ix, i)
             ix += 1
 
-def expandloop(intemplate, siblings, ix, indent, params):
+def expandloop(intemplate, siblings, ix, indent, file, params):
     elem = siblings[ix]
     if not intemplate:
         params = params.copy()
@@ -517,7 +517,7 @@ def expandloop(intemplate, siblings, ix, indent, params):
             if evalexpr(list(hwile)[0], indent, params) == 'False':
                 break
         for i in list(do):
-            i = shallowcopyelement(i)
+            i = expand(intemplate, shallowcopyelement(i), indent, file, params)
             i.text = expandstring(i.text, params)
             i.tail = expandstring(i.tail, params)
             siblings.insert(ix, i)
@@ -715,7 +715,7 @@ def expand(intemplate, elem, indent, file, params):
         elif kid.tag == 'Switch':
             expandswitch(kids, ix, indent, params)
         elif kid.tag == 'Loop':
-            expandloop(intemplate, kids, ix, indent, params)
+            expandloop(intemplate, kids, ix, indent, file, params)
         elif kid.tag == 'UseTemplate':
             expandusetemplate(kids, ix, indent + 1, filestack[-1], params)
         elif intemplate \
@@ -730,6 +730,8 @@ def expand(intemplate, elem, indent, file, params):
             kids[ix].tail = expandstring(kid.tail, params)
             ix += 1
 
+    # Expand parameters also in the element tag
+    elem.tag = expandstring(elem.tag, params)
     # Now drop all original children of elem and insert the expanded children instead
     removechildren(elem)
     for kid in kids:

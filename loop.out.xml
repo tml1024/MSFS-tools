@@ -1,8 +1,8 @@
 <Root>
   Hello.
-  <Foo>12</Foo>
-      <Foo>14</Foo>
-      <Foo>16</Foo>
+  <Foo_12>12</Foo_12>
+      <Foo_14>14</Foo_14>
+      <Foo_16>16</Foo_16>
     
     <CORRECT>1</CORRECT>
   <Bar>4</Bar>
