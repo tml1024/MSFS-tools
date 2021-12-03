@@ -529,6 +529,13 @@ def expandloop(intemplate, siblings, ix, indent, params):
             break
         loopvar += inc
         params[var] = str(loopvar)
+    if then != None:
+        for i in list(then):
+            i = shallowcopyelement(i)
+            i.text = expandstring(i.text, params)
+            i.tail = expandstring(i.tail, params)
+            siblings.insert(ix, i)
+            ix += 1
     # Set the tail of the original Loop element to the last of the inserted elements
     siblings[ix-1].tail = elem.tail
 

@@ -31,6 +31,9 @@
       <Do>
 	<WRONG>#IX#</WRONG>
       </Do>
+      <Then>
+	<CORRECT>#IX#</CORRECT>
+      </Then>
     </Loop>
   </Template>
   <Template Name="T2">

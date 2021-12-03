@@ -3,6 +3,8 @@
   <Foo>12</Foo>
       <Foo>14</Foo>
       <Foo>16</Foo>
+    
+    <CORRECT>1</CORRECT>
   <Bar>4</Bar>
       <Bar>3</Bar>
       <Bar>2</Bar>
