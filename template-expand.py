@@ -49,8 +49,7 @@ def verbose(indent, string):
         print(s + string, file=sys.stderr)
 
 def fatal(string):
-    print('\n' + string, file=sys.stderr)
-    exit(1)
+    raise AssertionError(string)
 
 def filemarker(path):
     if path == None:
